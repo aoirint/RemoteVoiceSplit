@@ -98,6 +98,7 @@ internal static class Program
             RoutingSessionRetiresAndRecovers();
             PluginRuntimeSurvivesComponentDestruction(assemblyPath);
             PluginConfigurationDefaultsToSilentFallback(assemblyPath);
+            PluginConfigurationUpdatesFallbackLive(assemblyPath);
             VoiceFallbackBoundaryUsesPolicy(assemblyPath);
             AudioHostWindowTitleIsStable();
             AudioHostProtocolRoundTrips();
@@ -173,7 +174,10 @@ internal static class Program
             "Application quit did not remove Harmony patches.");
 
         MethodDefinition dispose = runtime.Methods.Single(
-            method => string.Equals(method.Name, "TryDispose", StringComparison.Ordinal));
+            method => string.Equals(
+                method.Name,
+                "TryDisposeRouter",
+                StringComparison.Ordinal));
         Assert(
             Calls(dispose, "RemoteVoiceSplit.Interop.ProcessAudio.VoiceProcessRouter", "Dispose"),
             "Application quit did not stop the process-audio router.");
@@ -190,6 +194,22 @@ internal static class Program
                 instruction.Operand is MethodReference called &&
                 string.Equals(
                     called.DeclaringType.FullName,
+                    declaringType,
+                    StringComparison.Ordinal) &&
+                string.Equals(called.Name, methodName, StringComparison.Ordinal));
+    }
+
+    private static bool CallsGenericType(
+        MethodDefinition method,
+        string declaringType,
+        string methodName)
+    {
+        return method.Body.Instructions.Any(
+            instruction =>
+                instruction.OpCode.Code is Code.Call or Code.Callvirt &&
+                instruction.Operand is MethodReference called &&
+                string.Equals(
+                    called.DeclaringType.GetElementType().FullName,
                     declaringType,
                     StringComparison.Ordinal) &&
                 string.Equals(called.Name, methodName, StringComparison.Ordinal));
@@ -558,6 +578,12 @@ internal static class Program
         Assert(
             Calls(
                 callback,
+                "RemoteVoiceSplit.Core.RemoteVoiceFallbackState",
+                "get_FallbackToGameOutput"),
+            "The Unity audio callback did not read the live fallback state.");
+        Assert(
+            Calls(
+                callback,
                 "RemoteVoiceSplit.Core.VoiceCaptureStream",
                 "Clear"),
             "The silent fallback did not discard queued remote voice.");
@@ -568,30 +594,77 @@ internal static class Program
 
     private static void RemoteVoiceFallbackDefaultsToSilence()
     {
+        var fallback = new RemoteVoiceFallbackState(
+            RemoteVoiceFallbackPolicy.DefaultFallbackToGameOutput);
         Assert(
-            !RemoteVoiceFallbackPolicy.DefaultFallbackToGameOutput,
+            !fallback.FallbackToGameOutput,
             "Remote voice fallback did not default to silence.");
         Assert(
             RemoteVoiceFallbackPolicy.ShouldClearUnityOutput(
                 submissionAccepted: false,
-                fallbackToGameOutput:
-                    RemoteVoiceFallbackPolicy.DefaultFallbackToGameOutput),
+                fallbackToGameOutput: fallback.FallbackToGameOutput),
             "Unavailable process routing did not silence Unity output by default.");
+
+        fallback.Update(fallbackToGameOutput: true);
         Assert(
             !RemoteVoiceFallbackPolicy.ShouldClearUnityOutput(
                 submissionAccepted: false,
-                fallbackToGameOutput: true),
+                fallbackToGameOutput: fallback.FallbackToGameOutput),
             "The opt-out setting did not preserve Unity output while process routing was unavailable.");
         Assert(
             RemoteVoiceFallbackPolicy.ShouldClearUnityOutput(
                 submissionAccepted: true,
-                fallbackToGameOutput: false),
-            "Accepted process routing did not clear Unity output under the default setting.");
+                fallbackToGameOutput: fallback.FallbackToGameOutput),
+            "Accepted process routing did not clear Unity output when fallback was enabled.");
+
+        fallback.Update(fallbackToGameOutput: false);
         Assert(
             RemoteVoiceFallbackPolicy.ShouldClearUnityOutput(
                 submissionAccepted: true,
-                fallbackToGameOutput: true),
-            "Accepted process routing did not clear Unity output when fallback was enabled.");
+                fallbackToGameOutput: fallback.FallbackToGameOutput),
+            "Accepted process routing did not clear Unity output under the default setting.");
+    }
+
+    private static void PluginConfigurationUpdatesFallbackLive(
+        string assemblyPath)
+    {
+        using ModuleDefinition module = ModuleDefinition.ReadModule(assemblyPath);
+        TypeDefinition configuration = module.Types.Single(
+            type => string.Equals(
+                type.FullName,
+                "RemoteVoiceSplit.Interop.Game.RemoteVoiceFallbackConfiguration",
+                StringComparison.Ordinal));
+        MethodDefinition constructor = configuration.Methods.Single(
+            method => method.IsConstructor && !method.IsStatic);
+        MethodDefinition changed = configuration.Methods.Single(
+            method => string.Equals(
+                method.Name,
+                "OnSettingChanged",
+                StringComparison.Ordinal));
+        MethodDefinition dispose = configuration.Methods.Single(
+            method => string.Equals(
+                method.Name,
+                "Dispose",
+                StringComparison.Ordinal));
+
+        Assert(
+            CallsGenericType(
+                constructor,
+                "BepInEx.Configuration.ConfigEntry`1",
+                "add_SettingChanged"),
+            "The fallback configuration did not subscribe to live setting changes.");
+        Assert(
+            Calls(
+                changed,
+                "RemoteVoiceSplit.Core.RemoteVoiceFallbackState",
+                "Update"),
+            "A live setting change did not update the audio-thread fallback state.");
+        Assert(
+            CallsGenericType(
+                dispose,
+                "BepInEx.Configuration.ConfigEntry`1",
+                "remove_SettingChanged"),
+            "Fallback configuration shutdown did not unsubscribe its setting handler.");
     }
 
     private static void RoutingSessionRetiresAndRecovers()

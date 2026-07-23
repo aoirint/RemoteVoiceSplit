@@ -1,5 +1,6 @@
 using System;
 using BepInEx.Logging;
+using RemoteVoiceSplit.Core;
 using RemoteVoiceSplit.Interop.ProcessAudio;
 
 namespace RemoteVoiceSplit.Interop.Game;
@@ -12,12 +13,12 @@ internal static class IntegrationContext
     public static void Initialize(
         ManualLogSource logger,
         VoiceProcessRouter router,
-        bool fallbackToGameOutput)
+        RemoteVoiceFallbackState fallback)
     {
         _logger = logger;
         _routing = new VoiceRoutingContext(
             router,
-            fallbackToGameOutput);
+            fallback);
     }
 
     public static void Clear()
@@ -61,13 +62,13 @@ internal sealed class VoiceRoutingContext
 {
     public VoiceRoutingContext(
         VoiceProcessRouter router,
-        bool fallbackToGameOutput)
+        RemoteVoiceFallbackState fallback)
     {
         Router = router;
-        FallbackToGameOutput = fallbackToGameOutput;
+        Fallback = fallback;
     }
 
     public VoiceProcessRouter Router { get; }
 
-    public bool FallbackToGameOutput { get; }
+    public RemoteVoiceFallbackState Fallback { get; }
 }

@@ -4,14 +4,15 @@
 
 ### Added
 
-- Added `Audio.FallbackToGameOutput`. Set it to `true` and restart the game to
-  keep remote voice on the normal game output when separate process output
-  cannot accept it.
+- Added `Audio.FallbackToGameOutput`. Set it to `true` to keep remote voice on
+  the normal game output when separate process output cannot accept it.
 
 ### Changed
 
 - Remote voice is now silent by default while the separate audio host is
   unavailable or recovering, keeping it out of the game-audio recording track.
+- Changes made through a BepInEx configuration UI now apply immediately
+  without restarting the game.
 
 ## v0.1.0-alpha.1 - 2026-07-23
 

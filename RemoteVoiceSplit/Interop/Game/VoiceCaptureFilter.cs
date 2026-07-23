@@ -11,12 +11,12 @@ internal sealed class VoiceCaptureFilter : MonoBehaviour
 
     public void Initialize(
         VoiceProcessRouter router,
-        bool fallbackToGameOutput)
+        RemoteVoiceFallbackState fallback)
     {
         CaptureRegistration? current = _registration.Read();
         if (current is not null &&
             ReferenceEquals(current.Router, router) &&
-            current.FallbackToGameOutput == fallbackToGameOutput)
+            ReferenceEquals(current.Fallback, fallback))
         {
             enabled = true;
             return;
@@ -26,7 +26,7 @@ internal sealed class VoiceCaptureFilter : MonoBehaviour
         var registration = new CaptureRegistration(
             router,
             router.RegisterCapture(),
-            fallbackToGameOutput);
+            fallback);
         _registration.Exchange(registration);
         enabled = true;
     }
@@ -54,7 +54,7 @@ internal sealed class VoiceCaptureFilter : MonoBehaviour
         bool submissionAccepted = submission is not null;
         if (!RemoteVoiceFallbackPolicy.ShouldClearUnityOutput(
                 submissionAccepted,
-                registration.FallbackToGameOutput))
+                registration.Fallback.FallbackToGameOutput))
         {
             return;
         }
@@ -96,18 +96,18 @@ internal sealed class VoiceCaptureFilter : MonoBehaviour
         public CaptureRegistration(
             VoiceProcessRouter router,
             VoiceCaptureStream stream,
-            bool fallbackToGameOutput)
+            RemoteVoiceFallbackState fallback)
         {
             Router = router;
             Stream = stream;
-            FallbackToGameOutput = fallbackToGameOutput;
+            Fallback = fallback;
         }
 
         public VoiceProcessRouter Router { get; }
 
         public VoiceCaptureStream Stream { get; }
 
-        public bool FallbackToGameOutput { get; }
+        public RemoteVoiceFallbackState Fallback { get; }
 
         public AtomicCommitLease CommitLease { get; } = new();
     }

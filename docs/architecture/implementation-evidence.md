@@ -72,14 +72,14 @@ the actual process ancestry. Routing becomes ready only when:
 
 If any condition fails, the plugin clears Unity's callback buffer by default,
 so remote voice does not leak into the game-audio track. Users can set
-`Audio.FallbackToGameOutput` to `true` and restart the game to preserve Unity
-output instead.
+`Audio.FallbackToGameOutput` to `true` through a BepInEx configuration API to
+preserve Unity output immediately.
 
 The verified host PID remains stable across recoverable pipe and WASAPI
 failures. The host accepts a replacement session on the same unguessable pipe
 name, and both sides repeat their peer, image, and ancestry checks. Between a
 disconnect and the replacement ready message, the game side applies the
-startup-selected unavailable-host policy. After the first verified session,
+current atomic fallback policy. After the first verified session,
 the host waits for reconnection until the verified game-process handle signals
 exit. This avoids treating slow Unity startup or scene transitions as
 permission to remove the OBS window.

@@ -2,6 +2,7 @@
 
 This design depends on [Lethal Company voice playback](../domain/lethal-company-voice-playback.md),
 [BepInEx and Unity lifecycle](../domain/bepinex-unity-lifecycle.md),
+[BepInEx configuration](../domain/bepinex-configuration.md),
 [OBS process audio capture](../domain/obs-process-audio-capture.md), and the
 [Windows Core Audio contract](../domain/windows-core-audio.md). Host launch
 also depends on [Windows process creation](../domain/windows-process-creation.md).
@@ -41,11 +42,16 @@ float-stereo blocks. Mono input is duplicated; multichannel input uses the
 first two channels. Each source queue accepts a complete callback or rejects it
 atomically. The final mix is clamped to `[-1, 1]`.
 
-`Audio.FallbackToGameOutput` is read once during plugin
-startup and defaults to `false`. When submission is unavailable or a source
-queue rejects a block, the default policy discards queued samples and clears
-the Unity block. With the setting enabled, an unavailable block remains on
-Unity output. A successfully submitted block is always cleared from Unity.
+`Audio.FallbackToGameOutput` defaults to `false`. A BepInEx setting-change
+notification updates one atomic integer shared by the process sender and Unity
+audio callbacks. The callback therefore applies the new policy to its next
+voice block without reattaching sources or restarting either process.
+
+When submission is unavailable or a source queue rejects a block, the default
+policy discards queued samples and clears the Unity block. With the setting
+enabled, an unavailable block remains on Unity output. A successfully submitted
+block is always cleared from Unity. The mod does not watch external edits to
+the configuration file.
 
 The pipe name combines the game PID and a cryptographically random session
 identifier. The handshake validates protocol magic, version, sample rate,

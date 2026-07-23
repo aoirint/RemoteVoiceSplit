@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using BepInEx;
+using BepInEx.Configuration;
 using UnityEngine;
 using RemoteVoiceSplit.Core;
 using RemoteVoiceSplit.Interop.Game;
@@ -23,13 +24,14 @@ public sealed class Plugin : BaseUnityPlugin
 
         try
         {
-            bool fallbackToGameOutput = Config.Bind(
+            ConfigEntry<bool> fallbackToGameOutput = Config.Bind(
                 "Audio",
                 "FallbackToGameOutput",
                 RemoteVoiceFallbackPolicy.DefaultFallbackToGameOutput,
                 "Keep remote voices on the normal game output whenever separate process output cannot accept them. " +
                 "The default false value prevents remote voice from leaking into the game-audio recording track, " +
-                "but also makes remote voice inaudible until separate output recovers. Requires a game restart.").Value;
+                "but also makes remote voice inaudible until separate output recovers. " +
+                "Changes made through BepInEx configuration APIs apply immediately.");
 
             int sampleRate = AudioSettings.outputSampleRate;
             if (sampleRate <= 0)

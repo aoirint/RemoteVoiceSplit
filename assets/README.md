@@ -30,9 +30,10 @@ runs.
 
 BepInEx creates
 `BepInEx/config/com.aoirint.remotevoicesplit.cfg` after the first launch.
-Set `[Audio] FallbackToGameOutput = true` and restart the game to keep remote
-voice audible through the normal game output when separate process output
-cannot accept it. This opt-out can place remote voice in the game-audio track.
+Set `[Audio] FallbackToGameOutput = true` to keep remote voice audible through
+the normal game output when separate process output cannot accept it. Changes
+made through a BepInEx configuration UI apply immediately. This opt-out can
+place remote voice in the game-audio track.
 
 Only clients that want separate remote-voice recording need this mod.
 

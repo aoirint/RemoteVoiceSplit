@@ -17,6 +17,8 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 - Silences remote voice by default whenever separate process output cannot
   accept it, preventing it from leaking into the game-audio recording track.
+- Applies `Audio.FallbackToGameOutput` changes made through BepInEx
+  configuration APIs immediately without restarting the game.
 
 ## [0.1.0-alpha.1] - 2026-07-23
 

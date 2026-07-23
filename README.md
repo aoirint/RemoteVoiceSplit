@@ -54,8 +54,9 @@ FallbackToGameOutput = false
 Keep `false` for strict recording-track separation. Remote voices are
 inaudible whenever separate process output cannot accept them. Set it to
 `true` to fall back to `Lethal Company.exe` during those failures, accepting
-that remote voices can appear in the game-audio track. Restart the game after
-changing this setting.
+that remote voices can appear in the game-audio track. Changes made through a
+BepInEx configuration UI apply immediately to the next voice block. The mod
+does not watch external edits to the generated configuration file.
 
 ## Configure OBS Studio
 
