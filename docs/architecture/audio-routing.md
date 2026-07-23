@@ -70,8 +70,9 @@ lifetime. A pipe break, render failure, or default-endpoint change retires
 routing and restores Unity output, but the host keeps the same PID and waits
 for the plugin to reconnect. The replacement session revalidates the pipe peer,
 host image, and ancestry before it becomes ready. If the plugin does not
-reconnect within a bounded grace period, the host exits instead of remaining
-orphaned.
+reconnect immediately, the host keeps the OBS window available until the
+verified game process exits. The initial unconnected launch still has a bounded
+timeout so a failed startup does not leave a host behind.
 
 ## Concurrency and lifecycle
 

@@ -66,7 +66,9 @@ dotnet run --project RemoteVoiceSplit.Tests --no-build -c Release -- RemoteVoice
 
 Add `--live-audio` to the test command on a Windows machine with an active
 default render endpoint to exercise same-PID reconnection, forced termination,
-default-endpoint failure, and recovery.
+default-endpoint failure, and recovery. Use
+`--live-audio-soak-seconds 60` instead to include a sixty-second connected
+host-lifetime check.
 
 CI owns creation of the validated Thunderstore-compatible ZIP. Version `0.0.0`
 always produces an edge artifact and never a public release. See
