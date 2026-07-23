@@ -8,7 +8,9 @@ can be assigned to different recording tracks without a virtual audio device.
 
 Music, sound effects, and the local microphone remain in the normal Lethal
 Company process. When the audio host cannot be started or connected safely,
-remote voices stay on the normal game output instead of becoming silent.
+remote voices are silent by default so they do not leak into the game-audio
+recording track. An opt-out setting can keep them on the normal game output
+instead.
 
 The implementation and build-time verification are complete. A two-player
 runtime validation on the supported build is still required before a stable
@@ -37,6 +39,24 @@ Lethal Company/BepInEx/plugins/RemoteVoiceSplit/RemoteVoiceSplit.AudioHost.exe.c
 
 Do not rename or separate these files. Do not copy build-time BepInEx,
 Harmony, Unity, game, or .NET reference assemblies.
+
+## Configure fallback behavior
+
+BepInEx creates
+`BepInEx/config/com.aoirint.remotevoicesplit.cfg` after the first launch.
+The default is:
+
+```ini
+[Audio]
+FallbackToGameOutput = false
+```
+
+Keep `false` for strict recording-track separation. Remote voices are
+inaudible whenever separate process output cannot accept them. Set it to
+`true` to fall back to `Lethal Company.exe` during those failures, accepting
+that remote voices can appear in the game-audio track. Changes made through a
+BepInEx configuration UI apply immediately to the next voice block. The mod
+does not watch external edits to the generated configuration file.
 
 ## Configure OBS Studio
 
@@ -77,15 +97,17 @@ stable GitHub and Thunderstore publication remain disabled. See
 
 ## Troubleshooting
 
-- No `Lethal Company Remote Voice Split` window: confirm that both packaged files
-  remain together and inspect `BepInEx/LogOutput.log` for
+- No `Lethal Company Remote Voice Split` window: remote voices are silent with
+  the default fallback setting. Confirm that both packaged files remain
+  together and inspect `BepInEx/LogOutput.log` for
   `com.aoirint.remotevoicesplit`.
 - OBS shows the window but receives no voice: join a lobby with another player,
   verify that OBS targets `RemoteVoiceSplit.AudioHost.exe`, and check that the
   source is not muted.
-- Remote voice remains in the game source: the mod deliberately fails open
-  when the host is missing, exits, changes process ancestry, or loses its audio
-  endpoint. The first warning in the BepInEx log identifies that transition.
+- Remote voice remains in the game source: confirm that
+  `FallbackToGameOutput` is `false`. With `true`, the mod deliberately keeps
+  Unity output whenever separate process output cannot accept a voice block.
+  The first warning in the BepInEx log identifies that transition.
 - Duplicate remote voice: do not capture global Desktop Audio alongside both
   application sources, and remove other voice-routing mods while testing.
 

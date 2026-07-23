@@ -20,13 +20,15 @@ internal sealed class VoiceProcessRouter : IDisposable
     private readonly int _sampleRate;
     private readonly int _gameProcessId;
     private readonly string _audioHostPath;
+    private readonly RemoteVoiceFallbackState _fallback;
     private bool _disposed;
 
     public VoiceProcessRouter(
         ManualLogSource logger,
         int sampleRate,
         int gameProcessId,
-        string audioHostPath)
+        string audioHostPath,
+        RemoteVoiceFallbackState fallback)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         if (sampleRate <= 0)
@@ -47,6 +49,7 @@ internal sealed class VoiceProcessRouter : IDisposable
         _sampleRate = sampleRate;
         _gameProcessId = gameProcessId;
         _audioHostPath = audioHostPath;
+        _fallback = fallback ?? throw new ArgumentNullException(nameof(fallback));
         _worker = new Thread(WorkerMain)
         {
             IsBackground = true,
@@ -134,7 +137,9 @@ internal sealed class VoiceProcessRouter : IDisposable
                 {
                     TryLog(
                         LogLevel.Error,
-                        $"Remote voice process output is unavailable; Unity output remains enabled. {failure}");
+                        _fallback.FallbackToGameOutput
+                            ? $"Remote voice process output is unavailable; Unity output remains enabled. {failure}"
+                            : $"Remote voice process output is unavailable; remote voice remains silent until it recovers. {failure}");
                     lastFailure = failure;
                 }
             }

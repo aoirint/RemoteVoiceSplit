@@ -31,7 +31,8 @@ and repeatable maintainer procedures.
 
 - [Source layout](architecture/source-layout.md) owns project boundaries,
   dependency direction, and CI packaging ownership.
-- [Audio routing](architecture/audio-routing.md) owns the data path, concurrency model, lifecycle, and fail-open policy.
+- [Audio routing](architecture/audio-routing.md) owns the data path,
+  concurrency model, lifecycle, and unavailable-host policy.
 - [Game integration](architecture/game-integration.md) owns reflection targets,
   Harmony callbacks, player-role rules, and callback containment.
 - [Implementation evidence](architecture/implementation-evidence.md) records

@@ -8,6 +8,8 @@ of the mod.
   voice assignment, playback assets, and runtime boundaries.
 - [BepInEx and Unity lifecycle](bepinex-unity-lifecycle.md) covers plugin
   component ownership, destruction callbacks, and application-quit signaling.
+- [BepInEx configuration](bepinex-configuration.md) covers runtime setting
+  notifications and the boundary around external file edits.
 - [OBS process audio capture](obs-process-audio-capture.md) covers application
   loopback, process trees, and capture-window identity.
 - [Windows Core Audio](windows-core-audio.md) covers endpoint identity, render

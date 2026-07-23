@@ -45,6 +45,7 @@ device, endpoint-change, protocol, pipe, window-close, or game-exit failure
 ends the host session and discards queued samples. The game plugin retires
 readiness as soon as the pipe fails.
 
-Until a replacement host is connected and verified, Unity callback data
-remains unchanged. This fail-open policy prioritizes audible communication
-over strict track separation.
+Whether Unity callback data is cleared while the host is unavailable is a
+product policy, not a Core Audio constraint. Remote Voice Split's current
+choice is documented under
+[audio routing](../architecture/audio-routing.md).
