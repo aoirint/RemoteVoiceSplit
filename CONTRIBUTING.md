@@ -95,7 +95,7 @@ Run the checks that match your change before opening a pull request:
 ```powershell
 dotnet format RemoteVoiceSplit.slnx --no-restore --verify-no-changes
 dotnet build RemoteVoiceSplit.slnx --no-restore -c Release -p:BepInExPluginVersion=0.0.0
-dotnet run --project RemoteVoiceSplit.Tests --no-build -c Release -- RemoteVoiceSplit/bin/Release/netstandard2.1/RemoteVoiceSplit.dll RemoteVoiceSplit.AudioHost/bin/Release/net48/RemoteVoiceSplit.AudioHost.exe 0.1.0-alpha.3 0.1.0-alpha.3
+dotnet run --project RemoteVoiceSplit.Tests --no-build -c Release -- RemoteVoiceSplit/bin/Release/netstandard2.1/RemoteVoiceSplit.dll RemoteVoiceSplit.AudioHost/bin/Release/net48/RemoteVoiceSplit.AudioHost.exe 0.1.0-alpha.4 0.1.0-alpha.4
 pnpm --config.minimumReleaseAge=10080 --config.minimumReleaseAgeStrict=true --config.minimumReleaseAgeIgnoreMissingTime=false --config.minimumReleaseAgeExclude= dlx markdownlint-cli2@0.22.0 --config .markdownlint-cli2.yaml "**/*.md"
 shellcheck .github/actions/publish-thunderstore/publish-thunderstore.sh
 actionlint -color -pyflakes=
