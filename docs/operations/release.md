@@ -2,9 +2,14 @@
 
 ## Scope
 
-Pull Request and Main workflows build and validate the source. Stable GitHub
-and Thunderstore publication remains explicitly disabled. Project version
-`0.0.0` produces only commit-specific edge artifacts.
+Pull Request and Main workflows build and validate the source. GitHub
+prerelease publication is enabled for SemVer prerelease versions. Stable
+GitHub and Thunderstore publication remain explicitly disabled.
+
+The project version is currently `0.1.0-alpha.1`. The Main workflow creates a
+validated package artifact and immutable GitHub prerelease. BepInEx metadata
+and the Thunderstore manifest use `0.0.0` placeholders, and no Thunderstore
+upload occurs.
 
 Version classification, staging, ZIP creation, and checksums belong to
 `.github/workflows/main.yml`. Assembly and archive validation belongs to the
@@ -27,8 +32,9 @@ LICENSE
 ```
 
 Both binaries must be valid managed assemblies with the expected identity and
-version. The plugin must also contain exactly one matching `BepInPlugin` and
-`BepInProcess` attribute.
+numeric-core version. The plugin must also contain exactly one matching
+`BepInPlugin` and `BepInProcess` attribute. For a prerelease, the plugin
+attribute version is `0.0.0`.
 
 All entries must be regular root files with safe names. The validator rejects
 absolute paths, traversal, backslashes, links, duplicates, unexpected files,
@@ -52,10 +58,10 @@ A push to `main`:
 Packaging is CI-owned. Download an edge artifact from the successful Main
 workflow and verify `SHA256SUMS` before extraction.
 
-## Pre-release runtime checks
+## Stable release runtime checks
 
-Before changing the project version from `0.0.0`, use the exact Lethal Company
-v81 build and a clean BepInEx 5 profile:
+Before enabling stable publication, use the exact Lethal Company v81 build and
+a clean BepInEx 5 profile:
 
 - confirm the plugin loads without reflection or patch errors;
 - confirm the helper starts outside the Lethal Company process tree;
@@ -73,21 +79,38 @@ v81 build and a clean BepInEx 5 profile:
 
 Also verify BepInExPack installation, Thunderstore packaging, OBS monitoring,
 and coexistence with the intended release mod set. Record failures with enough
-context to reproduce them; do not publish from an unverified commit.
+context to reproduce them. These gaps do not block a clearly labeled GitHub
+alpha, but they must be closed before stable GitHub or Thunderstore
+publication.
+
+## Prepare a GitHub prerelease
+
+1. Add a complete SemVer prerelease section to `CHANGELOG.md`.
+2. Add the same version to `assets/CHANGELOG.md`.
+3. Set `Version` in both project files to that prerelease version.
+4. Record pending runtime validation in both changelogs.
+5. Run all development, workflow, package, dependency, and documentation
+   checks.
+6. Push the reviewed commit to `main`.
+
+CI keeps the prerelease identity in assembly metadata, the ZIP name, tag, and
+GitHub Release. It supplies `0.0.0` only to the BepInEx plugin attribute and
+Thunderstore manifest, then publishes the validated ZIP to GitHub as a
+prerelease. Thunderstore is not contacted.
 
 ## Prepare a stable release
 
-1. Complete the runtime checks for the exact commit.
+1. Complete the stable release runtime checks for the exact commit.
 2. Add matching versioned entries to both changelogs.
 3. Set `Version` in `RemoteVoiceSplit/RemoteVoiceSplit.csproj` and
    `RemoteVoiceSplit.AudioHost/RemoteVoiceSplit.AudioHost.csproj` to the same
    nonzero three-part version.
-4. Confirm repository settings, immutable Releases, the
-   `THUNDERSTORE_TOKEN`, namespace, community, and categories.
-5. Explicitly enable the stable-publication gate.
-6. Run all development, workflow, package, dependency, and documentation
+4. Confirm repository settings and immutable Releases.
+5. Confirm the `THUNDERSTORE_TOKEN`, namespace, community, and categories.
+6. Explicitly enable stable GitHub and Thunderstore publication.
+7. Run all development, workflow, package, dependency, and documentation
    checks.
-7. Push the reviewed commit to `main`.
+8. Push the reviewed commit to `main`.
 
 The release job never rebuilds the ZIP. It publishes the exact verified
 artifact to GitHub and then Thunderstore.

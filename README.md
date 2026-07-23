@@ -61,7 +61,7 @@ The repository pins .NET SDK 10.0.201 and all NuGet versions.
 dotnet restore RemoteVoiceSplit.slnx --locked-mode
 dotnet format RemoteVoiceSplit.slnx --no-restore --verify-no-changes
 dotnet build RemoteVoiceSplit.slnx --no-restore -c Release -p:BepInExPluginVersion=0.0.0
-dotnet run --project RemoteVoiceSplit.Tests --no-build -c Release -- RemoteVoiceSplit/bin/Release/netstandard2.1/RemoteVoiceSplit.dll RemoteVoiceSplit.AudioHost/bin/Release/net48/RemoteVoiceSplit.AudioHost.exe 0.0.0 0.0.0
+dotnet run --project RemoteVoiceSplit.Tests --no-build -c Release -- RemoteVoiceSplit/bin/Release/netstandard2.1/RemoteVoiceSplit.dll RemoteVoiceSplit.AudioHost/bin/Release/net48/RemoteVoiceSplit.AudioHost.exe 0.1.0-alpha.1 0.1.0-alpha.1
 ```
 
 Add `--live-audio` to the test command on a Windows machine with an active
@@ -71,7 +71,8 @@ default-endpoint failure, and recovery. Use
 host-lifetime check.
 
 CI owns creation of the validated Thunderstore-compatible ZIP. Version `0.0.0`
-always produces an edge artifact and never a public release. See
+always produces an edge artifact. SemVer prereleases publish only to GitHub;
+stable GitHub and Thunderstore publication remain disabled. See
 [release operations](docs/operations/release.md).
 
 ## Troubleshooting

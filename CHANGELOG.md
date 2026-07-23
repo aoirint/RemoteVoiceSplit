@@ -8,6 +8,8 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unreleased]
 
+## [0.1.0-alpha.1] - 2026-07-23
+
 ### Fixed
 
 - Replaced `Shell.Application` COM activation, which is unsupported by the
@@ -59,4 +61,11 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - Reused repository-family contribution, CI, release, and documentation
   structures while replacing the prior output-device selection design with a
   separate-process recording design.
-- Reserved project version `0.0.0` for non-release edge artifacts.
+- Reserved project version `0.0.0` for non-release edge artifacts and
+  enabled immutable GitHub prereleases for SemVer prerelease versions.
+- Kept prerelease BepInEx metadata and the Thunderstore manifest at `0.0.0`;
+  prerelease identity remains in assembly metadata, the ZIP name, tag, and
+  GitHub Release.
+
+[Unreleased]: https://github.com/aoirint/RemoteVoiceSplit/compare/v0.1.0-alpha.1...HEAD
+[0.1.0-alpha.1]: https://github.com/aoirint/RemoteVoiceSplit/releases/tag/v0.1.0-alpha.1

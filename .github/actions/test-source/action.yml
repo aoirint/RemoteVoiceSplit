@@ -9,9 +9,18 @@ runs:
 
     - name: Build release configuration
       shell: bash
-      run: >-
-        dotnet build RemoteVoiceSplit.slnx --no-restore
-        --configuration Release -p:BepInExPluginVersion=0.0.0
+      run: |
+        set -euo pipefail
+        project_version=$(dotnet msbuild \
+          RemoteVoiceSplit/RemoteVoiceSplit.csproj \
+          -getProperty:Version -nologo | tr -d '\r' | xargs)
+        dotnet_build_args=(--no-restore --configuration Release)
+        if [[ "${project_version}" == *"-"* ]]; then
+          # BepInEx 5 parses plugin metadata as System.Version and rejects
+          # SemVer prerelease labels. Keep release identity in Version.
+          dotnet_build_args+=(-p:BepInExPluginVersion=0.0.0)
+        fi
+        dotnet build RemoteVoiceSplit.slnx "${dotnet_build_args[@]}"
 
     - name: Run deterministic audio and package-contract tests
       shell: bash
