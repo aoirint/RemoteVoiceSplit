@@ -11,7 +11,7 @@ runs:
       shell: bash
       run: >-
         dotnet build RemoteVoiceSplit.slnx --no-restore
-        --configuration Release /p:BepInExPluginVersion=0.0.0
+        --configuration Release -p:BepInExPluginVersion=0.0.0
 
     - name: Run deterministic audio and package-contract tests
       shell: bash

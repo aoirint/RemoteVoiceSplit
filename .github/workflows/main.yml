@@ -128,7 +128,7 @@ jobs:
       - name: Build release configuration
         run: >-
           dotnet build RemoteVoiceSplit.slnx --no-restore
-          --configuration Release /p:BepInExPluginVersion=0.0.0
+          --configuration Release -p:BepInExPluginVersion=0.0.0
 
       - name: Create artifact
         run: |

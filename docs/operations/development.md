@@ -17,9 +17,9 @@ Run from the repository root:
 ```powershell
 dotnet restore RemoteVoiceSplit.slnx --locked-mode
 dotnet format RemoteVoiceSplit.slnx --no-restore --verify-no-changes
-dotnet build RemoteVoiceSplit.slnx --no-restore -c Debug /p:BepInExPluginVersion=0.0.0
+dotnet build RemoteVoiceSplit.slnx --no-restore -c Debug -p:BepInExPluginVersion=0.0.0
 dotnet run --project RemoteVoiceSplit.Tests --no-build -c Debug -- RemoteVoiceSplit/bin/Debug/netstandard2.1/RemoteVoiceSplit.dll RemoteVoiceSplit.AudioHost/bin/Debug/net48/RemoteVoiceSplit.AudioHost.exe 0.0.0 0.0.0
-dotnet build RemoteVoiceSplit.slnx --no-restore -c Release /p:BepInExPluginVersion=0.0.0
+dotnet build RemoteVoiceSplit.slnx --no-restore -c Release -p:BepInExPluginVersion=0.0.0
 dotnet run --project RemoteVoiceSplit.Tests --no-build -c Release -- RemoteVoiceSplit/bin/Release/netstandard2.1/RemoteVoiceSplit.dll RemoteVoiceSplit.AudioHost/bin/Release/net48/RemoteVoiceSplit.AudioHost.exe 0.0.0 0.0.0
 ```
 

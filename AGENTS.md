@@ -91,7 +91,7 @@ When building a prerelease DLL for local installation or runtime validation,
 pass a BepInEx-compatible plugin metadata version:
 
 ```powershell
-dotnet build RemoteVoiceSplit.slnx -c Release /p:BepInExPluginVersion=0.0.0
+dotnet build RemoteVoiceSplit.slnx -c Release -p:BepInExPluginVersion=0.0.0
 ```
 
 BepInEx 5 validates plugin metadata as `System.Version` and rejects SemVer
