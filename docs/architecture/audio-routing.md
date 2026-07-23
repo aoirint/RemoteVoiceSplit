@@ -1,6 +1,7 @@
 # Audio Routing Architecture
 
 This design depends on [Lethal Company voice playback](../domain/lethal-company-voice-playback.md),
+[BepInEx and Unity lifecycle](../domain/bepinex-unity-lifecycle.md),
 [OBS process audio capture](../domain/obs-process-audio-capture.md), and the
 [Windows Core Audio contract](../domain/windows-core-audio.md). Host launch
 also depends on [Windows process creation](../domain/windows-process-creation.md).
@@ -80,6 +81,11 @@ The Unity audio thread is each queue's producer. One plugin writer thread is
 their consumer and the pipe producer. One host session thread reads frames
 into a bounded queue, and one host render thread consumes that queue for
 WASAPI.
+
+The writer, Harmony patch, and integration context have game-process lifetime,
+not BepInEx component lifetime. Destroying the loader-owned plugin component
+does not retire routing. A static Unity application-quit subscription owns
+normal cleanup; an abrupt game-process exit owns crash cleanup.
 
 Registration retirement and routing-epoch retirement wait for in-flight
 submissions before clearing queues. A stale callback can therefore neither

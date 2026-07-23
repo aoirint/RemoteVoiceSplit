@@ -1,24 +1,17 @@
 using System;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.InteropServices;
 using BepInEx;
-using HarmonyLib;
 using UnityEngine;
 using RemoteVoiceSplit.Interop.Game;
-using RemoteVoiceSplit.Interop.ProcessAudio;
 
 namespace RemoteVoiceSplit;
 
 [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
 [BepInProcess("Lethal Company.exe")]
-[SuppressMessage("Design", "CA1001:Types that own disposable fields should be disposable", Justification = "Unity owns MonoBehaviour lifetime; OnDestroy performs the deterministic rollback.")]
 public sealed class Plugin : BaseUnityPlugin
 {
-    private Harmony? _harmony;
-    private VoiceProcessRouter? _router;
-
     private void Awake()
     {
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -39,46 +32,26 @@ public sealed class Plugin : BaseUnityPlugin
             string pluginDirectory = Path.GetDirectoryName(typeof(Plugin).Assembly.Location)
                 ?? throw new InvalidOperationException("The plugin assembly directory is unavailable.");
             string audioHostPath = Path.Combine(pluginDirectory, "RemoteVoiceSplit.AudioHost.exe");
-            _router = new VoiceProcessRouter(
+            bool initialized = PluginRuntime.Initialize(
                 Logger,
                 sampleRate,
                 Process.GetCurrentProcess().Id,
                 audioHostPath);
-            IntegrationContext.Initialize(Logger, _router);
-
-            _harmony = new Harmony(MyPluginInfo.PLUGIN_GUID);
-            _harmony.PatchAll(typeof(Plugin).Assembly);
-            Logger.LogInfo(
-                $"{MyPluginInfo.PLUGIN_NAME} {MyPluginInfo.PLUGIN_VERSION} loaded for Lethal Company v81.");
+            if (initialized)
+            {
+                Logger.LogInfo(
+                    $"{MyPluginInfo.PLUGIN_NAME} {MyPluginInfo.PLUGIN_VERSION} loaded for Lethal Company v81.");
+            }
+            else
+            {
+                Logger.LogInfo(
+                    "Remote Voice Split process-lifetime routing was already initialized.");
+            }
         }
         catch (Exception exception)
         {
-            IntegrationContext.Clear();
-            _harmony?.UnpatchSelf();
-            _router?.Dispose();
-            _harmony = null;
-            _router = null;
             Logger.LogError(
                 $"Remote Voice Split could not initialize and was disabled: {exception.GetType().Name}: {exception.Message}");
         }
-    }
-
-    private void OnDestroy()
-    {
-        try
-        {
-            Logger.LogInfo(
-                "Remote Voice Split is stopping; the audio host will close with the game process.");
-        }
-        catch
-        {
-            // Logging must not interrupt plugin teardown.
-        }
-
-        IntegrationContext.Clear();
-        _harmony?.UnpatchSelf();
-        _router?.Dispose();
-        _harmony = null;
-        _router = null;
     }
 }

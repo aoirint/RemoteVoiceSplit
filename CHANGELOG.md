@@ -19,6 +19,9 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
   session is now replaced.
 - Kept the host available for the verified game-process lifetime instead of
   closing it when a Unity startup transition exceeds a reconnection timeout.
+- Kept routing and Harmony integration alive when Unity destroys the BepInEx
+  plugin component during startup; cleanup now follows the application-quit
+  event instead of `OnDestroy`.
 
 ### Added
 

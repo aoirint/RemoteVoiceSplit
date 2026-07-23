@@ -36,7 +36,7 @@ process, tests, package contents, and user instructions are target-specific.
 | Fact | Status | Evidence and dependent decision |
 | --- | --- | --- |
 | Game build, runtime, and platform | Confirmed | Lethal Company v81, Steam Build `22825947`, Steam Manifest `6423525044216269478`, Windows; see [voice playback](../domain/lethal-company-voice-playback.md). |
-| BepInEx major and version | Confirmed for build and initial runtime | The plugin compiles against BepInEx 5.4.21 and packages for BepInExPack 5.4.2305. A v81 runtime run confirmed native host launch, handshake readiness, and the OBS-titled window under Unity Mono. The persistent-session correction still requires an in-game retest. |
+| BepInEx major and version | Confirmed for build and startup lifecycle observation | The plugin compiles against BepInEx 5.4.21 and packages for BepInExPack 5.4.2305. Runtime instrumentation on BepInEx 5.4.23.5 and Unity 2022.3.62.7762112 recorded plugin-component destruction immediately after Chainloader startup while the game continued initialization. A v81 Remote Voice Split run separately confirmed native host launch, handshake readiness, the persistent OBS-titled window, and its former component-destruction cleanup around the title transition. BepInEx source and Unity lifecycle semantics are recorded under [BepInEx and Unity lifecycle](../domain/bepinex-unity-lifecycle.md). Process-lifetime routing after the component destruction still requires an in-game retest. |
 | Plugin identity and version source | Confirmed | Assembly `RemoteVoiceSplit`, GUID `com.aoirint.remotevoicesplit`, display name `Remote Voice Split`, owner `aoirint`, and project `Version` as the release source. |
 | Game API, patch timing, and mod set | Confirmed statically and by deterministic branch tests; audible runtime pending | Postfix `StartOfRound.RefreshPlayerVoicePlaybackObjects()` after v81 assigns remote `AudioSource` objects. Host/client, death, spectating, and walkie-talkie scenarios exercise the production selection policy. Clean BepInEx plus this mod is the supported validation set; Unity filter ordering and third-party patch interaction remain unverified. |
 | OBS process capture | Confirmed statically; runtime pending | Windows captures a selected process and descendants. The audio host must be outside the game process tree; see [OBS process audio capture](../domain/obs-process-audio-capture.md). |
@@ -81,12 +81,20 @@ message. After the first verified session, the host waits for reconnection
 until the verified game-process handle signals exit. This avoids treating slow
 Unity startup or scene transitions as permission to remove the OBS window.
 
+The game-side runtime likewise outlives the BepInEx component. `PluginRuntime`
+holds the Harmony instance, router, logger, and integration context in static
+process-lifetime state. `Plugin.OnDestroy` no longer exists.
+`Application.quitting` is the only normal teardown signal. The built-assembly
+test verifies both the absence of component-destruction cleanup and the
+application-quit cleanup call path.
+
 ## Blocked release branches
 
 - Clean-profile two-player runtime validation has not run.
 - OBS source enumeration and two-track recording have not been observed.
-- Persistent same-process session recovery has passed the Windows harness but
-  has not been retested through a complete target-game startup.
+- Persistent same-process session recovery and process-lifetime plugin
+  ownership have passed the harness but have not been retested through a
+  complete target-game startup.
 - Physical default-endpoint changes, endpoint disconnection, and game-process
   crashes have not been observed.
 - Publication credentials and namespace authorization are not configured.
@@ -100,8 +108,8 @@ and package validation.
 - Locked restore, Debug and Release builds, and formatting complete with zero
   warnings.
 - Deterministic core, host/client, death, spectating, walkie-talkie, routing
-  lifecycle, protocol, ancestry, host-buffer, managed-identity, and package
-  mutation tests pass.
+  lifecycle, plugin component/application lifecycle, protocol, ancestry,
+  host-buffer, managed-identity, and package mutation tests pass.
 - The completed eight-file ZIP passes the production archive validator.
 - A local Windows live test started the default-endpoint WASAPI renderer,
   exercised its endpoint-change failure callback, proved fail-open routing,
