@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## v0.1.0-alpha.3 - 2026-07-23
+
 ### Added
 
 - Added `[General] Enabled`. Set it to `false` to disable voice separation and
@@ -12,6 +14,19 @@
 - Moved `FallbackToGameOutput` from `[Audio]` to `[General]`.
 - Changes to both settings through a BepInEx configuration UI apply
   immediately without restarting the game.
+
+### Notes
+
+- This is an alpha GitHub release. Complete two-player OBS track separation,
+  host/client and voice-path coverage, endpoint recovery, host termination,
+  and live configuration switching remain required before a stable release.
+- Upgrading from alpha.2 does not migrate
+  `[Audio] FallbackToGameOutput`; configure
+  `[General] FallbackToGameOutput` instead.
+- Compatibility: Lethal Company v81.
+    - Steam Build ID: `22825947`
+    - Steam Manifest ID: `6423525044216269478`
+- Install the mod only on clients that want separate remote-voice recording.
 
 ## v0.1.0-alpha.2 - 2026-07-23
 

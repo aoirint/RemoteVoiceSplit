@@ -8,6 +8,8 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unreleased]
 
+## [0.1.0-alpha.3] - 2026-07-23
+
 ### Added
 
 - Added `General.Enabled`, defaulting to `true`, so users can disable voice
@@ -19,6 +21,18 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
   routing failure policy rather than an audio-format or device parameter.
 - Applies both supported settings immediately when changed through a BepInEx
   configuration API.
+
+### Notes
+
+- This GitHub prerelease retains the alpha runtime-validation scope. Complete
+  two-player OBS track separation, host/client and voice-path coverage,
+  endpoint recovery, host termination, and live configuration switching remain
+  required before a stable release.
+- Upgrading from alpha.2 does not migrate
+  `Audio.FallbackToGameOutput`; configure
+  `General.FallbackToGameOutput` instead.
+- Compatibility: Lethal Company v81, Steam Build `22825947`, Steam Manifest
+  `6423525044216269478`, Windows, and BepInEx 5.
 
 ## [0.1.0-alpha.2] - 2026-07-23
 
@@ -102,6 +116,7 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
   prerelease identity remains in assembly metadata, the ZIP name, tag, and
   GitHub Release.
 
-[Unreleased]: https://github.com/aoirint/RemoteVoiceSplit/compare/v0.1.0-alpha.2...HEAD
+[Unreleased]: https://github.com/aoirint/RemoteVoiceSplit/compare/v0.1.0-alpha.3...HEAD
+[0.1.0-alpha.3]: https://github.com/aoirint/RemoteVoiceSplit/releases/tag/v0.1.0-alpha.3
 [0.1.0-alpha.2]: https://github.com/aoirint/RemoteVoiceSplit/releases/tag/v0.1.0-alpha.2
 [0.1.0-alpha.1]: https://github.com/aoirint/RemoteVoiceSplit/releases/tag/v0.1.0-alpha.1

@@ -15,7 +15,7 @@
     <Product>Remote Voice Split</Product>
     <Description>Moves remote Lethal Company player voices to an OBS-capturable audio process.</Description>
     <!-- APP_VERSION_MARKER -->
-    <Version>0.1.0-alpha.2</Version>
+    <Version>0.1.0-alpha.3</Version>
     <Authors>aoirint</Authors>
     <Company>aoirint</Company>
     <RepositoryUrl>https://github.com/aoirint/RemoteVoiceSplit</RepositoryUrl>
