@@ -8,6 +8,7 @@
   outside the Lethal Company process tree for OBS capture.
 - Keeps the OBS-selectable audio-host window running while its audio connection
   recovers from a temporary failure.
+- Keeps waiting for recovery during slow game startup and scene transitions.
 
 ### Added
 

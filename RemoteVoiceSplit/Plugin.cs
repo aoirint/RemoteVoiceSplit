@@ -65,6 +65,16 @@ public sealed class Plugin : BaseUnityPlugin
 
     private void OnDestroy()
     {
+        try
+        {
+            Logger.LogInfo(
+                "Remote Voice Split is stopping; the audio host will close with the game process.");
+        }
+        catch
+        {
+            // Logging must not interrupt plugin teardown.
+        }
+
         IntegrationContext.Clear();
         _harmony?.UnpatchSelf();
         _router?.Dispose();

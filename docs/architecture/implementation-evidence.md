@@ -77,8 +77,9 @@ The verified host PID remains stable across recoverable pipe and WASAPI
 failures. The host accepts a replacement session on the same unguessable pipe
 name, and both sides repeat their peer, image, and ancestry checks. The game
 side remains fail-open between the disconnect and the replacement ready
-message. A bounded reconnect grace period prevents an abandoned plugin from
-leaving the host process behind.
+message. After the first verified session, the host waits for reconnection
+until the verified game-process handle signals exit. This avoids treating slow
+Unity startup or scene transitions as permission to remove the OBS window.
 
 ## Blocked release branches
 
@@ -107,8 +108,9 @@ and package validation.
   and started a replacement renderer.
 - Local live audio-host tests used the production native launcher, verified the
   Windows Explorer image before launch, proved the host was outside the test
-  process tree, and completed the peer-identity handshake, same-PID reconnect
-  after a pipe break, forced host termination, broken-pipe observation, exact
+  process tree, held one connection for sixty seconds, kept the host alive for
+  seventeen disconnected seconds, and completed the peer-identity handshake,
+  same-PID reconnect, forced host termination, broken-pipe observation, exact
   OBS window-title check, and a new host handshake after crash recovery.
 - NuGet reports no known vulnerable or deprecated package in the locked graph.
 - ShellCheck, actionlint, pinact, canonical repository-file rendering, and

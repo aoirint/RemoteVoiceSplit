@@ -20,7 +20,7 @@ internal static class Program
             if (args.Length < 4)
             {
                 throw new ArgumentException(
-                    "Pass the built plugin DLL, audio host EXE, project version, artifact version, an optional package ZIP, and optionally --live-audio.",
+                    "Pass the built plugin DLL, audio host EXE, project version, artifact version, an optional package ZIP, and optional live-audio flags.",
                     nameof(args));
             }
 
@@ -30,10 +30,29 @@ internal static class Program
             string expectedArtifactVersion = args[3];
             string? archivePath = null;
             bool runLiveAudio = false;
+            int liveAudioSoakSeconds = 0;
             for (int index = 4; index < args.Length; index++)
             {
                 if (string.Equals(args[index], "--live-audio", StringComparison.Ordinal))
                 {
+                    runLiveAudio = true;
+                    continue;
+                }
+
+                if (string.Equals(
+                        args[index],
+                        "--live-audio-soak-seconds",
+                        StringComparison.Ordinal))
+                {
+                    if (index + 1 >= args.Length ||
+                        !int.TryParse(args[++index], out liveAudioSoakSeconds) ||
+                        liveAudioSoakSeconds <= 0)
+                    {
+                        throw new ArgumentException(
+                            "--live-audio-soak-seconds requires a positive integer.",
+                            nameof(args));
+                    }
+
                     runLiveAudio = true;
                     continue;
                 }
@@ -83,7 +102,9 @@ internal static class Program
             if (runLiveAudio)
             {
                 DefaultEndpointChangeFailsOpenAndRecovers();
-                AudioHostReconnectCrashAndRestart(audioHostPath);
+                AudioHostReconnectCrashAndRestart(
+                    audioHostPath,
+                    TimeSpan.FromSeconds(liveAudioSoakSeconds));
                 Console.WriteLine(
                     "Live default-endpoint, stable-host reconnect, crash, and recovery tests passed.");
             }
@@ -561,17 +582,19 @@ internal static class Program
         gate.Deactivate();
     }
 
-    private static void AudioHostReconnectCrashAndRestart(string audioHostPath)
+    private static void AudioHostReconnectCrashAndRestart(
+        string audioHostPath,
+        TimeSpan soakDuration)
     {
         using (LiveAudioHostConnection disconnected = StartAudioHost(audioHostPath))
         {
+            AssertHostSurvives(disconnected.Process, soakDuration);
             string pipeName = disconnected.PipeName;
             int persistentProcessId = disconnected.Process.Id;
             disconnected.CloseClient();
-            Thread.Sleep(500);
-            Assert(
-                !disconnected.Process.HasExited,
-                "The audio host exited after a recoverable game-side pipe disconnect.");
+            AssertHostSurvives(
+                disconnected.Process,
+                TimeSpan.FromSeconds(17));
 
             using LiveAudioHostConnection reconnected = ConnectAudioHost(
                 pipeName,
@@ -596,6 +619,23 @@ internal static class Program
             Assert(
                 !recovered.Process.HasExited,
                 "The replacement audio host did not retain its reconnectable session.");
+        }
+    }
+
+    private static void AssertHostSurvives(Process process, TimeSpan duration)
+    {
+        if (duration <= TimeSpan.Zero)
+        {
+            return;
+        }
+
+        var elapsed = Stopwatch.StartNew();
+        while (elapsed.Elapsed < duration)
+        {
+            Assert(
+                !process.HasExited,
+                $"The audio host exited during a {duration.TotalSeconds:0}-second connected soak.");
+            Thread.Sleep(TimeSpan.FromSeconds(1));
         }
     }
 

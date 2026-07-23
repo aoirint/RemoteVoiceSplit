@@ -17,6 +17,8 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - Kept the OBS-facing audio-host process and window stable across recoverable
   pipe, renderer, and default-endpoint failures; only the verified connection
   session is now replaced.
+- Kept the host available for the verified game-process lifetime instead of
+  closing it when a Unity startup transition exceeds a reconnection timeout.
 
 ### Added
 

@@ -10,7 +10,6 @@ namespace RemoteVoiceSplit.AudioHost;
 internal sealed class AudioHostSession : IDisposable
 {
     private static readonly TimeSpan InitialConnectionTimeout = TimeSpan.FromSeconds(10);
-    private static readonly TimeSpan ReconnectionTimeout = TimeSpan.FromSeconds(15);
     private static readonly TimeSpan SessionRetryDelay = TimeSpan.FromMilliseconds(250);
     private readonly string _pipeName;
     private readonly int _gameProcessId;
@@ -87,8 +86,9 @@ internal sealed class AudioHostSession : IDisposable
             gameExited.Set();
         }
 
-        // Preserve the OBS-selected PID across recoverable audio and pipe failures,
-        // but bound the lifetime when the plugin disappears without the game exiting.
+        // Preserve the OBS-selected PID across recoverable audio and pipe failures.
+        // The verified game-process handle, rather than a reconnect timeout, owns
+        // cleanup so slow Unity scene transitions cannot remove the OBS window.
         bool connectedOnce = false;
         while (!_stop.WaitOne(0) && !gameExited.WaitOne(0))
         {
@@ -102,10 +102,10 @@ internal sealed class AudioHostSession : IDisposable
                     PipeTransmissionMode.Byte,
                     PipeOptions.Asynchronous);
                 Interlocked.Exchange(ref _activePipe, pipe);
-                TimeSpan timeout = connectedOnce
-                    ? ReconnectionTimeout
-                    : InitialConnectionTimeout;
-                if (!WaitForConnection(pipe, gameExited, timeout))
+                if (!WaitForConnection(
+                        pipe,
+                        gameExited,
+                        connectedOnce ? null : InitialConnectionTimeout))
                 {
                     return;
                 }
@@ -141,12 +141,13 @@ internal sealed class AudioHostSession : IDisposable
     private bool WaitForConnection(
         NamedPipeServerStream pipe,
         WaitHandle gameExited,
-        TimeSpan timeout)
+        TimeSpan? timeout)
     {
         IAsyncResult connection = pipe.BeginWaitForConnection(callback: null, state: null);
-        int signaled = WaitHandle.WaitAny(
-            new WaitHandle[] { _stop, connection.AsyncWaitHandle, gameExited },
-            timeout);
+        var waits = new WaitHandle[] { _stop, connection.AsyncWaitHandle, gameExited };
+        int signaled = timeout.HasValue
+            ? WaitHandle.WaitAny(waits, timeout.Value)
+            : WaitHandle.WaitAny(waits);
         if (signaled != 1)
         {
             return false;
