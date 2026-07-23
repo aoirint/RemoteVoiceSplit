@@ -21,8 +21,9 @@ docs/
 router construction, and integration lifecycle wiring. `Core/` owns
 framework-independent buffering, mixing, protocol framing, registration
 leases, and process-ancestry logic. `Interop/Game/` owns reflection and Unity
-callbacks. `Interop/ProcessAudio/` owns shell launch, process-tree inspection,
-and named-pipe session control.
+callbacks. `Interop/ProcessAudio/` owns detached host launch, process-tree
+inspection, and named-pipe session control. Its launcher uses native Windows
+extended process creation rather than managed Shell COM activation.
 
 `RemoteVoiceSplit.AudioHost/` is a Windows .NET Framework 4.8 executable. It
 owns the capture window, named-pipe server, bounded receive buffer, Core Audio

@@ -20,7 +20,24 @@ internal static class ProcessImagePath
         {
             throw new Win32Exception(
                 Marshal.GetLastWin32Error(),
-                "Windows could not open the audio host process for identity verification.");
+                "Windows could not open a process for image-path verification.");
+        }
+
+        return Get(process);
+    }
+
+    public static string Get(SafeProcessHandle process)
+    {
+        if (process is null)
+        {
+            throw new System.ArgumentNullException(nameof(process));
+        }
+
+        if (process.IsInvalid || process.IsClosed)
+        {
+            throw new System.ArgumentException(
+                "A live process handle is required.",
+                nameof(process));
         }
 
         var path = new StringBuilder(32768);
@@ -29,7 +46,7 @@ internal static class ProcessImagePath
         {
             throw new Win32Exception(
                 Marshal.GetLastWin32Error(),
-                "Windows could not read the audio host executable path.");
+                "Windows could not read a process executable path.");
         }
 
         return path.ToString();

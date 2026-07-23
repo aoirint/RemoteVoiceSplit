@@ -8,6 +8,13 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unreleased]
 
+### Fixed
+
+- Replaced `Shell.Application` COM activation, which is unsupported by the
+  target Unity Mono runtime, with native Windows explicit-parent process
+  creation while preserving fail-open behavior and OBS process-tree
+  separation.
+
 ### Added
 
 - A client-side BepInEx 5 plugin for Lethal Company v81 on Windows.

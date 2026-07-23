@@ -22,6 +22,8 @@ and repeatable maintainer procedures.
   process-loopback and capture-window requirements.
 - [Windows Core Audio](domain/windows-core-audio.md) records endpoint identity,
   format, COM, and WASAPI facts used by the implementation.
+- [Windows process creation](domain/windows-process-creation.md) records
+  desktop-shell identity and explicit-parent process creation.
 - [Dependency baseline](domain/dependencies.md) records package provenance, pinning, scope, and security review.
 - [GitHub automation dependencies](domain/github-automation.md) records pinned Actions and downloaded tool review.
 

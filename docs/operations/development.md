@@ -31,8 +31,9 @@ not require a game installation, OBS, or active render endpoint.
 On a Windows development machine with an active default render endpoint, add
 `--live-audio` to the test arguments. This starts the production WASAPI pump
 and audio-host executable, then verifies endpoint-change failure, fail-open,
-normal host exit, forced host termination, and recovery. The injected endpoint
-change does not alter the user's Windows default-device setting.
+Explorer-parent launch outside the test process tree, normal host exit, forced
+host termination, and recovery. The injected endpoint change does not alter
+the user's Windows default-device setting.
 
 ## Dependency checks
 

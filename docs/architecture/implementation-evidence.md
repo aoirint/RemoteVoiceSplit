@@ -36,13 +36,13 @@ process, tests, package contents, and user instructions are target-specific.
 | Fact | Status | Evidence and dependent decision |
 | --- | --- | --- |
 | Game build, runtime, and platform | Confirmed | Lethal Company v81, Steam Build `22825947`, Steam Manifest `6423525044216269478`, Windows; see [voice playback](../domain/lethal-company-voice-playback.md). |
-| BepInEx major and version | Confirmed for build; runtime pending | The plugin compiles against BepInEx 5.4.21 and packages for BepInExPack 5.4.2305. A clean-profile runtime pass remains required. |
+| BepInEx major and version | Confirmed for build and initial runtime | The plugin compiles against BepInEx 5.4.21 and packages for BepInExPack 5.4.2305. A v81 runtime log confirmed plugin execution and fail-open behavior when the original managed Shell COM launcher failed. The corrected native launcher still requires an in-game retest. |
 | Plugin identity and version source | Confirmed | Assembly `RemoteVoiceSplit`, GUID `com.aoirint.remotevoicesplit`, display name `Remote Voice Split`, owner `aoirint`, and project `Version` as the release source. |
 | Game API, patch timing, and mod set | Confirmed statically and by deterministic branch tests; audible runtime pending | Postfix `StartOfRound.RefreshPlayerVoicePlaybackObjects()` after v81 assigns remote `AudioSource` objects. Host/client, death, spectating, and walkie-talkie scenarios exercise the production selection policy. Clean BepInEx plus this mod is the supported validation set; Unity filter ordering and third-party patch interaction remain unverified. |
 | OBS process capture | Confirmed statically; runtime pending | Windows captures a selected process and descendants. The audio host must be outside the game process tree; see [OBS process audio capture](../domain/obs-process-audio-capture.md). |
 | Package host | Confirmed | Thunderstore Lethal Company package using the repository-family archive layout. |
 | Release mode | Confirmed | Project version `0.0.0` is edge-only. Stable release and all publication remain disabled. |
-| GitHub Actions and Releases | Yes; settings blocked | Workflows build and retain validated edge artifacts. Repository settings, immutable releases, and secrets cannot be confirmed before the new repository exists. |
+| GitHub Actions and Releases | Confirmed for edge builds | The public repository enforces protected-branch checks and pinned Actions. Workflows build and retain validated edge artifacts; release publication remains inert at version `0.0.0`. |
 | Thunderstore | Yes; publication blocked | Package assets and inert publisher tooling are retained. Namespace authorization, runtime evidence, and publication authorization are blocked. |
 | APM | Yes | The pinned family Skill set is retained. Project metadata changes without changing dependency pins. |
 
@@ -53,10 +53,16 @@ background thread, and sends float stereo frames through a session-scoped named
 pipe. `RemoteVoiceSplit.AudioHost.exe` receives those frames and renders them
 through the current Windows multimedia default endpoint.
 
-The host is requested through the Windows shell rather than directly spawned by
-the game. This is only a launch attempt, not proof of separation. The host
-returns its process identifier during the handshake, and the plugin walks the
-actual process ancestry. Routing becomes ready only when:
+The plugin identifies the interactive Windows Explorer shell, verifies its
+image path using the opened parent-process handle, and starts the host through
+native extended process creation with Explorer as the explicit parent. This
+avoids managed Shell COM activation, which produced
+`NotImplementedException` in the target Unity Mono runtime. It also keeps the
+host outside the game process tree required by OBS capture.
+
+The explicit parent is only a launch attempt, not proof of separation. The
+host returns its process identifier during the handshake, and the plugin walks
+the actual process ancestry. Routing becomes ready only when:
 
 1. the protocol handshake succeeds;
 2. Windows reports the expected game and host PIDs for the pipe peers;
@@ -71,12 +77,11 @@ Remote voices therefore remain audible in the normal game output.
 
 - Clean-profile two-player runtime validation has not run.
 - OBS source enumeration and two-track recording have not been observed.
-- Shell-launched ancestry behavior has not been observed on the target
-  installation.
+- Native explicit-parent launch has passed the Windows harness but has not been
+  retested inside the target Unity Mono runtime.
 - Physical default-endpoint changes, endpoint disconnection, and game-process
   crashes have not been observed.
-- The new GitHub repository, repository settings, and publication credentials
-  do not exist in this worktree.
+- Publication credentials and namespace authorization are not configured.
 
 These blockers prevent a compatibility approval, stable version, GitHub
 Release, or Thunderstore upload. They do not block deterministic implementation
@@ -93,9 +98,11 @@ and package validation.
 - A local Windows live test started the default-endpoint WASAPI renderer,
   exercised its endpoint-change failure callback, proved fail-open routing,
   and started a replacement renderer.
-- Local live audio-host tests completed the peer-identity handshake, normal
-  pipe-close exit, forced host termination, broken-pipe observation, exact OBS
-  window-title check, and a new host handshake after recovery.
+- Local live audio-host tests used the production native launcher, verified the
+  Windows Explorer image before launch, proved the host was outside the test
+  process tree, and completed the peer-identity handshake, normal pipe-close
+  exit, forced host termination, broken-pipe observation, exact OBS window-title
+  check, and a new host handshake after recovery.
 - NuGet reports no known vulnerable or deprecated package in the locked graph.
 - ShellCheck, actionlint, pinact, canonical repository-file rendering, and
   Markdown lint pass.
