@@ -14,6 +14,9 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
   target Unity Mono runtime, with native Windows explicit-parent process
   creation while preserving fail-open behavior and OBS process-tree
   separation.
+- Kept the OBS-facing audio-host process and window stable across recoverable
+  pipe, renderer, and default-endpoint failures; only the verified connection
+  session is now replaced.
 
 ### Added
 

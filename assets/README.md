@@ -17,14 +17,15 @@ track from `Lethal Company.exe`. No virtual audio device is required.
 ## Setup
 
 1. Install the package and start Lethal Company.
-2. Join a lobby so the **Lethal Company Remote Voice Split** window appears.
+2. Wait for the **Lethal Company Remote Voice Split** window to appear.
 3. Add that window as an OBS Application Audio Capture source.
 4. Capture Lethal Company separately and assign the sources to different
    recording tracks.
 
 The companion process uses the current Windows multimedia default output.
 When separate routing is unavailable, remote voice remains on the normal game
-output instead of being muted.
+output instead of being muted. Its OBS-selectable window remains available
+across temporary audio-device or connection recovery while the game runs.
 
 Only clients that want separate remote-voice recording need this mod.
 

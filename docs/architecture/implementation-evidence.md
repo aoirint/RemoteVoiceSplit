@@ -36,7 +36,7 @@ process, tests, package contents, and user instructions are target-specific.
 | Fact | Status | Evidence and dependent decision |
 | --- | --- | --- |
 | Game build, runtime, and platform | Confirmed | Lethal Company v81, Steam Build `22825947`, Steam Manifest `6423525044216269478`, Windows; see [voice playback](../domain/lethal-company-voice-playback.md). |
-| BepInEx major and version | Confirmed for build and initial runtime | The plugin compiles against BepInEx 5.4.21 and packages for BepInExPack 5.4.2305. A v81 runtime log confirmed plugin execution and fail-open behavior when the original managed Shell COM launcher failed. The corrected native launcher still requires an in-game retest. |
+| BepInEx major and version | Confirmed for build and initial runtime | The plugin compiles against BepInEx 5.4.21 and packages for BepInExPack 5.4.2305. A v81 runtime run confirmed native host launch, handshake readiness, and the OBS-titled window under Unity Mono. The persistent-session correction still requires an in-game retest. |
 | Plugin identity and version source | Confirmed | Assembly `RemoteVoiceSplit`, GUID `com.aoirint.remotevoicesplit`, display name `Remote Voice Split`, owner `aoirint`, and project `Version` as the release source. |
 | Game API, patch timing, and mod set | Confirmed statically and by deterministic branch tests; audible runtime pending | Postfix `StartOfRound.RefreshPlayerVoicePlaybackObjects()` after v81 assigns remote `AudioSource` objects. Host/client, death, spectating, and walkie-talkie scenarios exercise the production selection policy. Clean BepInEx plus this mod is the supported validation set; Unity filter ordering and third-party patch interaction remain unverified. |
 | OBS process capture | Confirmed statically; runtime pending | Windows captures a selected process and descendants. The audio host must be outside the game process tree; see [OBS process audio capture](../domain/obs-process-audio-capture.md). |
@@ -73,12 +73,19 @@ the actual process ancestry. Routing becomes ready only when:
 If any condition fails, the plugin does not clear Unity's callback buffer.
 Remote voices therefore remain audible in the normal game output.
 
+The verified host PID remains stable across recoverable pipe and WASAPI
+failures. The host accepts a replacement session on the same unguessable pipe
+name, and both sides repeat their peer, image, and ancestry checks. The game
+side remains fail-open between the disconnect and the replacement ready
+message. A bounded reconnect grace period prevents an abandoned plugin from
+leaving the host process behind.
+
 ## Blocked release branches
 
 - Clean-profile two-player runtime validation has not run.
 - OBS source enumeration and two-track recording have not been observed.
-- Native explicit-parent launch has passed the Windows harness but has not been
-  retested inside the target Unity Mono runtime.
+- Persistent same-process session recovery has passed the Windows harness but
+  has not been retested through a complete target-game startup.
 - Physical default-endpoint changes, endpoint disconnection, and game-process
   crashes have not been observed.
 - Publication credentials and namespace authorization are not configured.
@@ -100,9 +107,9 @@ and package validation.
   and started a replacement renderer.
 - Local live audio-host tests used the production native launcher, verified the
   Windows Explorer image before launch, proved the host was outside the test
-  process tree, and completed the peer-identity handshake, normal pipe-close
-  exit, forced host termination, broken-pipe observation, exact OBS window-title
-  check, and a new host handshake after recovery.
+  process tree, and completed the peer-identity handshake, same-PID reconnect
+  after a pipe break, forced host termination, broken-pipe observation, exact
+  OBS window-title check, and a new host handshake after crash recovery.
 - NuGet reports no known vulnerable or deprecated package in the locked graph.
 - ShellCheck, actionlint, pinact, canonical repository-file rendering, and
   Markdown lint pass.

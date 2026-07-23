@@ -6,6 +6,8 @@
 
 - Fixed audio-host startup under the Unity Mono runtime while keeping the host
   outside the Lethal Company process tree for OBS capture.
+- Keeps the OBS-selectable audio-host window running while its audio connection
+  recovers from a temporary failure.
 
 ### Added
 

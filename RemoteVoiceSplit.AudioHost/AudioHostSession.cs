@@ -9,6 +9,9 @@ namespace RemoteVoiceSplit.AudioHost;
 
 internal sealed class AudioHostSession : IDisposable
 {
+    private static readonly TimeSpan InitialConnectionTimeout = TimeSpan.FromSeconds(10);
+    private static readonly TimeSpan ReconnectionTimeout = TimeSpan.FromSeconds(15);
+    private static readonly TimeSpan SessionRetryDelay = TimeSpan.FromMilliseconds(250);
     private readonly string _pipeName;
     private readonly int _gameProcessId;
     private readonly Action _onExit;
@@ -76,15 +79,6 @@ internal sealed class AudioHostSession : IDisposable
     private void Run()
     {
         using Process gameProcess = Process.GetProcessById(_gameProcessId);
-        using var pipe = new NamedPipeServerStream(
-            _pipeName,
-            PipeDirection.InOut,
-            maxNumberOfServerInstances: 1,
-            PipeTransmissionMode.Byte,
-            PipeOptions.Asynchronous);
-        Interlocked.Exchange(ref _activePipe, pipe);
-
-        IAsyncResult connection = pipe.BeginWaitForConnection(callback: null, state: null);
         using var gameExited = new ManualResetEvent(initialState: gameProcess.HasExited);
         gameProcess.EnableRaisingEvents = true;
         gameProcess.Exited += (_, _) => gameExited.Set();
@@ -93,15 +87,79 @@ internal sealed class AudioHostSession : IDisposable
             gameExited.Set();
         }
 
+        // Preserve the OBS-selected PID across recoverable audio and pipe failures,
+        // but bound the lifetime when the plugin disappears without the game exiting.
+        bool connectedOnce = false;
+        while (!_stop.WaitOne(0) && !gameExited.WaitOne(0))
+        {
+            NamedPipeServerStream? pipe = null;
+            try
+            {
+                pipe = new NamedPipeServerStream(
+                    _pipeName,
+                    PipeDirection.InOut,
+                    maxNumberOfServerInstances: 1,
+                    PipeTransmissionMode.Byte,
+                    PipeOptions.Asynchronous);
+                Interlocked.Exchange(ref _activePipe, pipe);
+                TimeSpan timeout = connectedOnce
+                    ? ReconnectionTimeout
+                    : InitialConnectionTimeout;
+                if (!WaitForConnection(pipe, gameExited, timeout))
+                {
+                    return;
+                }
+
+                connectedOnce = true;
+                RunConnectedSession(pipe, gameExited);
+            }
+            catch (Exception exception)
+            {
+                if (_stop.WaitOne(0) || gameExited.WaitOne(0))
+                {
+                    return;
+                }
+
+                Trace.WriteLine(exception);
+            }
+            finally
+            {
+                if (pipe is not null)
+                {
+                    Interlocked.CompareExchange(ref _activePipe, null, pipe);
+                    pipe.Dispose();
+                }
+            }
+
+            if (_stop.WaitOne(SessionRetryDelay))
+            {
+                return;
+            }
+        }
+    }
+
+    private bool WaitForConnection(
+        NamedPipeServerStream pipe,
+        WaitHandle gameExited,
+        TimeSpan timeout)
+    {
+        IAsyncResult connection = pipe.BeginWaitForConnection(callback: null, state: null);
         int signaled = WaitHandle.WaitAny(
             new WaitHandle[] { _stop, connection.AsyncWaitHandle, gameExited },
-            TimeSpan.FromSeconds(10));
+            timeout);
         if (signaled != 1)
         {
-            return;
+            return false;
         }
 
         pipe.EndWaitForConnection(connection);
+        return true;
+    }
+
+    private void RunConnectedSession(
+        NamedPipeServerStream pipe,
+        WaitHandle gameExited)
+    {
         if (NamedPipeClientIdentity.GetClientProcessId(pipe) != _gameProcessId)
         {
             throw new InvalidOperationException(
@@ -118,7 +176,7 @@ internal sealed class AudioHostSession : IDisposable
 
         var bytes = new byte[checked(AudioHostProtocol.MaximumBlockSamples * sizeof(float))];
         var samples = new float[AudioHostProtocol.MaximumBlockSamples];
-        while (!_stop.WaitOne(0) && !gameProcess.HasExited)
+        while (!_stop.WaitOne(0) && !gameExited.WaitOne(0))
         {
             int sampleCount = reader.ReadInt32();
             if (sampleCount == 0)
