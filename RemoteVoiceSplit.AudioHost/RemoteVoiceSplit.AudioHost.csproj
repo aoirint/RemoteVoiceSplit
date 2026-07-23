@@ -12,6 +12,8 @@
     <AnalysisLevel>latest-recommended</AnalysisLevel>
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
     <RestoreLockedMode Condition="'$(CI)' == 'true'">true</RestoreLockedMode>
+    <RuntimeIdentifiers>win-x86</RuntimeIdentifiers>
+    <AutomaticallyUseReferenceAssemblyPackages>false</AutomaticallyUseReferenceAssemblyPackages>
     <AssemblyName>RemoteVoiceSplit.AudioHost</AssemblyName>
     <RootNamespace>RemoteVoiceSplit.AudioHost</RootNamespace>
     <Product>Remote Voice Split Audio Host</Product>
