@@ -40,7 +40,7 @@ public sealed class Plugin : BaseUnityPlugin
             if (initialized)
             {
                 Logger.LogInfo(
-                    $"{MyPluginInfo.PLUGIN_NAME} {MyPluginInfo.PLUGIN_VERSION} loaded for Lethal Company v81.");
+                    $"{MyPluginInfo.PLUGIN_NAME} {MyPluginInfo.PLUGIN_VERSION} loaded.");
             }
             else
             {
