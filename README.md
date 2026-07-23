@@ -40,7 +40,7 @@ Harmony, Unity, game, or .NET reference assemblies.
 
 ## Configure OBS Studio
 
-1. Start Lethal Company and join a lobby so the audio host starts.
+1. Start Lethal Company and wait for the audio-host window to appear.
 2. In OBS, add an **Application Audio Capture (BETA)** source.
 3. Select the window named **Lethal Company Remote Voice Split**.
 4. Capture `Lethal Company.exe` separately for game audio.
@@ -50,7 +50,8 @@ Harmony, Unity, game, or .NET reference assemblies.
 Disable global Desktop Audio or otherwise exclude duplicate monitoring when it
 would record the same sounds a second time. The companion process renders to
 the current Windows multimedia default output, so players still hear remote
-voice normally.
+voice normally. Its OBS-selectable window remains available across temporary
+audio-device or connection recovery while Lethal Company keeps running.
 
 ## Build
 
@@ -64,7 +65,7 @@ dotnet run --project RemoteVoiceSplit.Tests --no-build -c Release -- RemoteVoice
 ```
 
 Add `--live-audio` to the test command on a Windows machine with an active
-default render endpoint to exercise host exit, forced termination,
+default render endpoint to exercise same-PID reconnection, forced termination,
 default-endpoint failure, and recovery.
 
 CI owns creation of the validated Thunderstore-compatible ZIP. Version `0.0.0`

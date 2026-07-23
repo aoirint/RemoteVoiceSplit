@@ -11,6 +11,7 @@ namespace RemoteVoiceSplit.Interop.ProcessAudio;
 internal sealed class VoiceProcessRouter : IDisposable
 {
     private const int CaptureCapacitySamples = 1 << 17;
+    private static readonly TimeSpan SessionRetryDelay = TimeSpan.FromSeconds(1);
     private readonly ManualLogSource _logger;
     private readonly VoiceAudioMixer _mixer = new();
     private readonly ManualResetEvent _stop = new(initialState: false);
@@ -108,12 +109,22 @@ internal sealed class VoiceProcessRouter : IDisposable
 
     private void WorkerMain()
     {
+        string pipeName = $"RemoteVoiceSplit-{_gameProcessId}-{Guid.NewGuid():N}";
+        int hostProcessId = 0;
         string? lastFailure = null;
         while (!_stop.WaitOne(0))
         {
             try
             {
-                RunSession();
+                if (!IsExpectedHostProcess(hostProcessId))
+                {
+                    hostProcessId = DetachedAudioHostLauncher.Launch(
+                        _audioHostPath,
+                        pipeName,
+                        _gameProcessId);
+                }
+
+                RunSession(pipeName, hostProcessId);
                 lastFailure = null;
             }
             catch (Exception exception)
@@ -132,18 +143,15 @@ internal sealed class VoiceProcessRouter : IDisposable
                 SetNotReady();
             }
 
-            if (!_stop.WaitOne(TimeSpan.FromSeconds(5)))
+            if (!_stop.WaitOne(SessionRetryDelay))
             {
                 continue;
             }
         }
     }
 
-    private void RunSession()
+    private void RunSession(string pipeName, int expectedHostProcessId)
     {
-        string pipeName = $"RemoteVoiceSplit-{_gameProcessId}-{Guid.NewGuid():N}";
-        DetachedAudioHostLauncher.Launch(_audioHostPath, pipeName, _gameProcessId);
-
         using var pipe = new NamedPipeClientStream(
             ".",
             pipeName,
@@ -154,6 +162,12 @@ internal sealed class VoiceProcessRouter : IDisposable
         using var writer = new BinaryWriter(pipe, System.Text.Encoding.UTF8, leaveOpen: true);
         AudioHostProtocol.WriteClientHello(writer, _sampleRate);
         int hostProcessId = AudioHostProtocol.ReadServerReady(reader);
+        if (hostProcessId != expectedHostProcessId)
+        {
+            throw new InvalidOperationException(
+                "The audio host handshake did not match the launched process.");
+        }
+
         int pipeServerProcessId = NamedPipeServerIdentity.GetServerProcessId(pipe);
         if (hostProcessId != pipeServerProcessId)
         {
@@ -161,25 +175,51 @@ internal sealed class VoiceProcessRouter : IDisposable
                 "The audio host handshake did not match the actual pipe server process.");
         }
 
-        string expectedHostPath = Path.GetFullPath(_audioHostPath);
-        string actualHostPath = Path.GetFullPath(ProcessImagePath.Get(hostProcessId));
-        if (!string.Equals(expectedHostPath, actualHostPath, StringComparison.OrdinalIgnoreCase))
-        {
-            throw new InvalidOperationException(
-                "The actual pipe server is not the packaged Remote Voice Split audio host.");
-        }
-
-        if (ProcessTreeSnapshot.IsSelfOrDescendant(hostProcessId, _gameProcessId))
-        {
-            throw new InvalidOperationException(
-                "The audio host remained inside the game process tree and cannot provide an isolated OBS source.");
-        }
+        VerifyExpectedHostProcess(hostProcessId);
 
         SetReady();
         TryLog(
             LogLevel.Info,
             "Remote voice process output is ready. Select 'Lethal Company Remote Voice Split' in OBS Application Audio Capture.");
         SendAudio(pipe, writer);
+    }
+
+    private bool IsExpectedHostProcess(int processId)
+    {
+        if (processId <= 0)
+        {
+            return false;
+        }
+
+        try
+        {
+            VerifyExpectedHostProcess(processId);
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    private void VerifyExpectedHostProcess(int processId)
+    {
+        string expectedHostPath = Path.GetFullPath(_audioHostPath);
+        string actualHostPath = Path.GetFullPath(ProcessImagePath.Get(processId));
+        if (!string.Equals(
+                expectedHostPath,
+                actualHostPath,
+                StringComparison.OrdinalIgnoreCase))
+        {
+            throw new InvalidOperationException(
+                "The actual pipe server is not the packaged Remote Voice Split audio host.");
+        }
+
+        if (ProcessTreeSnapshot.IsSelfOrDescendant(processId, _gameProcessId))
+        {
+            throw new InvalidOperationException(
+                "The audio host remained inside the game process tree and cannot provide an isolated OBS source.");
+        }
     }
 
     private void SendAudio(NamedPipeClientStream pipe, BinaryWriter writer)

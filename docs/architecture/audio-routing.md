@@ -65,6 +65,14 @@ The host window is minimized and titled
 `Lethal Company Remote Voice Split`. Closing the window closes the pipe and
 immediately retires game-side readiness.
 
+The host process and window have game-process lifetime rather than connection
+lifetime. A pipe break, render failure, or default-endpoint change retires
+routing and restores Unity output, but the host keeps the same PID and waits
+for the plugin to reconnect. The replacement session revalidates the pipe peer,
+host image, and ancestry before it becomes ready. If the plugin does not
+reconnect within a bounded grace period, the host exits instead of remaining
+orphaned.
+
 ## Concurrency and lifecycle
 
 The Unity audio thread is each queue's producer. One plugin writer thread is
@@ -79,9 +87,11 @@ backlog is discarded rather than replayed after recovery.
 
 The host opens the current Windows multimedia default endpoint and publishes
 ready only after `IAudioClient.Start` succeeds. A default-endpoint change,
-device error, host close, protocol error, or game exit terminates that session.
-The plugin retries launch after a bounded delay. Until a replacement session
-is fully verified, later callbacks remain on Unity output.
+device error, or protocol error terminates only the current connection session.
+The plugin reconnects to the same host process after a bounded delay. A host
+close or crash permits a replacement process; game exit terminates the host.
+Until a replacement session is fully verified, later callbacks remain on Unity
+output.
 
 This fail-open policy prioritizes audible communication over perfect
 separation during transitions. One transition block can be duplicated or
@@ -97,7 +107,8 @@ epoch after recovery. Its optional live-audio suite additionally:
 - starts a replacement renderer on the current endpoint;
 - launches the production host with Windows Explorer as its verified parent
   and checks that it is outside the test process tree;
-- closes a real audio-host pipe and checks normal process exit; and
+- closes a real audio-host pipe, verifies that the OBS-facing PID survives,
+  and reconnects to that same process; and
 - kills a real audio-host process, observes the broken pipe, and completes a
   new host handshake.
 

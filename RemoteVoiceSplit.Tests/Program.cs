@@ -83,9 +83,9 @@ internal static class Program
             if (runLiveAudio)
             {
                 DefaultEndpointChangeFailsOpenAndRecovers();
-                AudioHostExitCrashAndRestart(audioHostPath);
+                AudioHostReconnectCrashAndRestart(audioHostPath);
                 Console.WriteLine(
-                    "Live default-endpoint, audio-host exit, crash, and recovery tests passed.");
+                    "Live default-endpoint, stable-host reconnect, crash, and recovery tests passed.");
             }
 
             PackageContractTests.Run(
@@ -561,14 +561,25 @@ internal static class Program
         gate.Deactivate();
     }
 
-    private static void AudioHostExitCrashAndRestart(string audioHostPath)
+    private static void AudioHostReconnectCrashAndRestart(string audioHostPath)
     {
-        using (LiveAudioHostConnection cleanExit = StartAudioHost(audioHostPath))
+        using (LiveAudioHostConnection disconnected = StartAudioHost(audioHostPath))
         {
-            cleanExit.CloseClient();
+            string pipeName = disconnected.PipeName;
+            int persistentProcessId = disconnected.Process.Id;
+            disconnected.CloseClient();
+            Thread.Sleep(500);
             Assert(
-                cleanExit.Process.WaitForExit(5000),
-                "The audio host did not exit after its game-side pipe closed.");
+                !disconnected.Process.HasExited,
+                "The audio host exited after a recoverable game-side pipe disconnect.");
+
+            using LiveAudioHostConnection reconnected = ConnectAudioHost(
+                pipeName,
+                persistentProcessId);
+            AssertEqual(
+                persistentProcessId,
+                reconnected.Process.Id,
+                "Pipe recovery replaced the stable OBS audio-host process.");
         }
 
         using (LiveAudioHostConnection crashed = StartAudioHost(audioHostPath))
@@ -581,9 +592,10 @@ internal static class Program
         using (LiveAudioHostConnection recovered = StartAudioHost(audioHostPath))
         {
             recovered.CloseClient();
+            Thread.Sleep(500);
             Assert(
-                recovered.Process.WaitForExit(5000),
-                "The replacement audio host did not complete a clean session.");
+                !recovered.Process.HasExited,
+                "The replacement audio host did not retain its reconnectable session.");
         }
     }
 
@@ -594,6 +606,13 @@ internal static class Program
             audioHostPath,
             pipeName,
             Environment.ProcessId);
+        return ConnectAudioHost(pipeName, launchedProcessId);
+    }
+
+    private static LiveAudioHostConnection ConnectAudioHost(
+        string pipeName,
+        int expectedProcessId)
+    {
         Process? process = null;
         var pipe = new NamedPipeClientStream(
             ".",
@@ -609,7 +628,7 @@ internal static class Program
             AudioHostProtocol.WriteClientHello(writer, 48000);
             int reportedProcessId = AudioHostProtocol.ReadServerReady(reader);
             AssertEqual(
-                launchedProcessId,
+                expectedProcessId,
                 reportedProcessId,
                 "The audio host handshake reported another process.");
             process = Process.GetProcessById(reportedProcessId);
@@ -635,12 +654,17 @@ internal static class Program
                     windowTitle,
                     StringComparison.Ordinal),
                 $"The live audio-host window title was '{windowTitle}'.");
-            return new LiveAudioHostConnection(process, pipe, reader, writer);
+            return new LiveAudioHostConnection(
+                pipeName,
+                process,
+                pipe,
+                reader,
+                writer);
         }
         catch
         {
             pipe.Dispose();
-            process ??= TryGetProcess(launchedProcessId);
+            process ??= TryGetProcess(expectedProcessId);
             if (process is not null)
             {
                 if (!process.HasExited)
@@ -722,11 +746,13 @@ internal static class Program
         private bool _clientClosed;
 
         public LiveAudioHostConnection(
+            string pipeName,
             Process process,
             NamedPipeClientStream pipe,
             BinaryReader reader,
             BinaryWriter writer)
         {
+            PipeName = pipeName;
             Process = process;
             Pipe = pipe;
             _reader = reader;
@@ -734,6 +760,8 @@ internal static class Program
         }
 
         public Process Process { get; }
+
+        public string PipeName { get; }
 
         public NamedPipeClientStream Pipe { get; }
 
