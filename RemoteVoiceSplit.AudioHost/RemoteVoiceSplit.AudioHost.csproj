@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <LangVersion>10.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <UseWindowsForms>true</UseWindowsForms>
+    <Deterministic>true</Deterministic>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <RestoreLockedMode Condition="'$(CI)' == 'true'">true</RestoreLockedMode>
+    <AssemblyName>RemoteVoiceSplit.AudioHost</AssemblyName>
+    <RootNamespace>RemoteVoiceSplit.AudioHost</RootNamespace>
+    <Product>Remote Voice Split Audio Host</Product>
+    <Description>Renders remote Lethal Company voice audio as a separate OBS-capturable process.</Description>
+    <!-- APP_VERSION_MARKER -->
+    <Version>0.0.0</Version>
+    <Authors>aoirint</Authors>
+    <Company>aoirint</Company>
+    <RepositoryUrl>https://github.com/aoirint/RemoteVoiceSplit</RepositoryUrl>
+    <PackageId>RemoteVoiceSplit.AudioHost</PackageId>
+    <DebugType>portable</DebugType>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\RemoteVoiceSplit\Core\AudioHostProtocol.cs" Link="Core\AudioHostProtocol.cs" />
+    <Compile Include="..\RemoteVoiceSplit\Core\AudioRingBuffer.cs" Link="Core\AudioRingBuffer.cs" />
+    <Compile Include="AudioHostForm.cs" />
+    <Compile Include="AudioHostSession.cs" />
+    <Compile Include="AudioHostWindowIdentity.cs" />
+    <Compile Include="AudioOutputPump.cs" />
+    <Compile Include="NamedPipeClientIdentity.cs" />
+    <Compile Include="PcmAudioBuffer.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Interop\WindowsAudio\AudioEndpointService.cs" />
+    <Compile Include="Interop\WindowsAudio\CoreAudioInterop.cs" />
+    <Compile Include="Interop\WindowsAudio\WasapiRenderer.cs" />
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net48" Version="[1.0.3]" PrivateAssets="all" />
+  </ItemGroup>
+</Project>

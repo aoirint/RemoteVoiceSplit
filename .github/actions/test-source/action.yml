@@ -1,0 +1,32 @@
+name: Test source and package contract
+description: Build both binaries and run deterministic audio and package tests.
+
+runs:
+  using: composite
+  steps:
+    - name: Set up locked .NET environment
+      uses: ./.github/actions/setup-dotnet
+
+    - name: Build release configuration
+      shell: bash
+      run: >-
+        dotnet build RemoteVoiceSplit.slnx --no-restore
+        --configuration Release /p:BepInExPluginVersion=0.0.0
+
+    - name: Run deterministic audio and package-contract tests
+      shell: bash
+      run: |
+        set -euo pipefail
+        project_version=$(dotnet msbuild \
+          RemoteVoiceSplit/RemoteVoiceSplit.csproj \
+          -getProperty:Version -nologo | tr -d '\r' | xargs)
+        host_version=$(dotnet msbuild \
+          RemoteVoiceSplit.AudioHost/RemoteVoiceSplit.AudioHost.csproj \
+          -getProperty:Version -nologo | tr -d '\r' | xargs)
+        [[ "${project_version}" == "${host_version}" ]]
+        dotnet run \
+          --project RemoteVoiceSplit.Tests \
+          --no-build --configuration Release -- \
+          RemoteVoiceSplit/bin/Release/netstandard2.1/RemoteVoiceSplit.dll \
+          RemoteVoiceSplit.AudioHost/bin/Release/net48/RemoteVoiceSplit.AudioHost.exe \
+          "${project_version}" "${project_version}"

@@ -1,0 +1,106 @@
+# Implementation Evidence
+
+This document records the evidence and unresolved gates used to create Remote
+Voice Split. External assumptions are owned by the linked domain documents;
+this document owns the product decisions made from those assumptions.
+
+## Request classification
+
+The primary request type is `implementation`.
+The repository is an isolated new-mod candidate based on
+VoiceOutputDeviceChanger revision
+`49ab2d1e496afaad7e901285843f0ced73c0f636`.
+
+Portable repository governance, APM deployment, CI structure, line-ending
+policy, package-host conventions, and documentation topology use that revision
+as the repository-family baseline. Product identity, audio transport, helper
+process, tests, package contents, and user instructions are target-specific.
+
+## Baseline delta
+
+| Area | Treatment | Reason |
+| --- | --- | --- |
+| License, CLA terms, PR template, code ownership, line endings, Markdown policy | Reused exactly | Portable repository-family governance |
+| Contributor verification commands | Target-specific | The package now contains a plugin and a .NET Framework host |
+| APM dependency set and full commit pins | Reused exactly | The same reviewed development Skills apply |
+| Event ownership, permissions, action pins, release classifier, checksums, and inert publication gate | Reused with target variables | Portable CI and supply-chain policy |
+| Project, plugin, assembly, package, repository, and artifact identity | Replaced | Independent mod and distribution identity |
+| Settings UI and selected-endpoint controller | Removed | This mod requires no in-game configuration or virtual endpoint |
+| Game-side WASAPI renderer | Replaced | Audio must render in a distinct OBS-selectable process |
+| Core queues and lifecycle leases | Reused and extended | Proven portable concurrency primitives now feed pipe frames |
+| Companion process, protocol, peer identity, process-tree check, tests, and package configuration | Added | Required by process-capture separation and safe fail-open behavior |
+| Domain and architecture documents | Reworked | OBS process trees replace endpoint selection as the governing external contract |
+
+## Evidence ledger
+
+| Fact | Status | Evidence and dependent decision |
+| --- | --- | --- |
+| Game build, runtime, and platform | Confirmed | Lethal Company v81, Steam Build `22825947`, Steam Manifest `6423525044216269478`, Windows; see [voice playback](../domain/lethal-company-voice-playback.md). |
+| BepInEx major and version | Confirmed for build; runtime pending | The plugin compiles against BepInEx 5.4.21 and packages for BepInExPack 5.4.2305. A clean-profile runtime pass remains required. |
+| Plugin identity and version source | Confirmed | Assembly `RemoteVoiceSplit`, GUID `com.aoirint.remotevoicesplit`, display name `Remote Voice Split`, owner `aoirint`, and project `Version` as the release source. |
+| Game API, patch timing, and mod set | Confirmed statically and by deterministic branch tests; audible runtime pending | Postfix `StartOfRound.RefreshPlayerVoicePlaybackObjects()` after v81 assigns remote `AudioSource` objects. Host/client, death, spectating, and walkie-talkie scenarios exercise the production selection policy. Clean BepInEx plus this mod is the supported validation set; Unity filter ordering and third-party patch interaction remain unverified. |
+| OBS process capture | Confirmed statically; runtime pending | Windows captures a selected process and descendants. The audio host must be outside the game process tree; see [OBS process audio capture](../domain/obs-process-audio-capture.md). |
+| Package host | Confirmed | Thunderstore Lethal Company package using the repository-family archive layout. |
+| Release mode | Confirmed | Project version `0.0.0` is edge-only. Stable release and all publication remain disabled. |
+| GitHub Actions and Releases | Yes; settings blocked | Workflows build and retain validated edge artifacts. Repository settings, immutable releases, and secrets cannot be confirmed before the new repository exists. |
+| Thunderstore | Yes; publication blocked | Package assets and inert publisher tooling are retained. Namespace authorization, runtime evidence, and publication authorization are blocked. |
+| APM | Yes | The pinned family Skill set is retained. Project metadata changes without changing dependency pins. |
+
+## Selected design
+
+The plugin captures post-effect remote-player Unity audio, mixes it on a
+background thread, and sends float stereo frames through a session-scoped named
+pipe. `RemoteVoiceSplit.AudioHost.exe` receives those frames and renders them
+through the current Windows multimedia default endpoint.
+
+The host is requested through the Windows shell rather than directly spawned by
+the game. This is only a launch attempt, not proof of separation. The host
+returns its process identifier during the handshake, and the plugin walks the
+actual process ancestry. Routing becomes ready only when:
+
+1. the protocol handshake succeeds;
+2. Windows reports the expected game and host PIDs for the pipe peers;
+3. the server image path equals the packaged host;
+4. the host has opened and started WASAPI rendering; and
+5. the host is not the game process or one of its descendants.
+
+If any condition fails, the plugin does not clear Unity's callback buffer.
+Remote voices therefore remain audible in the normal game output.
+
+## Blocked release branches
+
+- Clean-profile two-player runtime validation has not run.
+- OBS source enumeration and two-track recording have not been observed.
+- Shell-launched ancestry behavior has not been observed on the target
+  installation.
+- Physical default-endpoint changes, endpoint disconnection, and game-process
+  crashes have not been observed.
+- The new GitHub repository, repository settings, and publication credentials
+  do not exist in this worktree.
+
+These blockers prevent a compatibility approval, stable version, GitHub
+Release, or Thunderstore upload. They do not block deterministic implementation
+and package validation.
+
+## Completed static verification
+
+- Locked restore, Debug and Release builds, and formatting complete with zero
+  warnings.
+- Deterministic core, host/client, death, spectating, walkie-talkie, routing
+  lifecycle, protocol, ancestry, host-buffer, managed-identity, and package
+  mutation tests pass.
+- The completed eight-file ZIP passes the production archive validator.
+- A local Windows live test started the default-endpoint WASAPI renderer,
+  exercised its endpoint-change failure callback, proved fail-open routing,
+  and started a replacement renderer.
+- Local live audio-host tests completed the peer-identity handshake, normal
+  pipe-close exit, forced host termination, broken-pipe observation, exact OBS
+  window-title check, and a new host handshake after recovery.
+- NuGet reports no known vulnerable or deprecated package in the locked graph.
+- ShellCheck, actionlint, pinact, canonical repository-file rendering, and
+  Markdown lint pass.
+- APM 0.25.0 reproduced the locked Skill files without drift. Its CI audit
+  currently reports a `config-consistency` failure because the installed
+  subpath dependency directories do not contain their source `apm.yml`; the
+  same audit reports ref consistency, deployed files, package set, subset
+  selection, and on-disk drift as clean.
