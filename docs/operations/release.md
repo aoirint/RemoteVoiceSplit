@@ -6,7 +6,7 @@ Pull Request and Main workflows build and validate the source. GitHub
 prerelease publication is enabled for SemVer prerelease versions. Stable
 GitHub and Thunderstore publication remain explicitly disabled.
 
-The project version is currently `0.1.0-alpha.1`. The Main workflow creates a
+The project version is currently `0.1.0-alpha.2`. The Main workflow creates a
 validated package artifact and immutable GitHub prerelease. BepInEx metadata
 and the Thunderstore manifest use `0.0.0` placeholders, and no Thunderstore
 upload occurs.
