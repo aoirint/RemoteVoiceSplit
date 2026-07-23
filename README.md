@@ -88,7 +88,7 @@ The repository pins .NET SDK 10.0.201 and all NuGet versions.
 dotnet restore RemoteVoiceSplit.slnx --locked-mode
 dotnet format RemoteVoiceSplit.slnx --no-restore --verify-no-changes
 dotnet build RemoteVoiceSplit.slnx --no-restore -c Release -p:BepInExPluginVersion=0.0.0
-dotnet run --project RemoteVoiceSplit.Tests --no-build -c Release -- RemoteVoiceSplit/bin/Release/netstandard2.1/RemoteVoiceSplit.dll RemoteVoiceSplit.AudioHost/bin/Release/net48/RemoteVoiceSplit.AudioHost.exe 0.1.0-alpha.2 0.1.0-alpha.2
+dotnet run --project RemoteVoiceSplit.Tests --no-build -c Release -- RemoteVoiceSplit/bin/Release/netstandard2.1/RemoteVoiceSplit.dll RemoteVoiceSplit.AudioHost/bin/Release/net48/RemoteVoiceSplit.AudioHost.exe 0.1.0-alpha.3 0.1.0-alpha.3
 ```
 
 Add `--live-audio` to the test command on a Windows machine with an active
