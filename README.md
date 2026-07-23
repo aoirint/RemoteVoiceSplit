@@ -4,7 +4,7 @@ Remote Voice Split is a client-side BepInEx 5 Mono mod for Lethal Company on
 Windows. It plays voices from other players through a small companion process
 named `RemoteVoiceSplit.AudioHost.exe`. OBS Studio can capture that process as
 an Application Audio Capture source, so remote voice and the rest of the game
-can be assigned to different recording tracks without a virtual audio device.
+can be assigned to different recording tracks.
 
 Music, sound effects, and the local microphone remain in the normal Lethal
 Company process. When the audio host cannot be started or connected safely,

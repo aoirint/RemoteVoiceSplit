@@ -8,6 +8,10 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unreleased]
 
+### Changed
+
+- Refocused the user-facing introduction on OBS recording-track separation.
+
 ## [0.1.0-alpha.4] - 2026-07-23
 
 ### Changed

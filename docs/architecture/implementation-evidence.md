@@ -25,7 +25,7 @@ process, tests, package contents, and user instructions are target-specific.
 | APM dependency set and full commit pins | Reused exactly | The same reviewed development Skills apply |
 | Event ownership, permissions, action pins, release classifier, checksums, and inert publication gate | Reused with target variables | Portable CI and supply-chain policy |
 | Project, plugin, assembly, package, repository, and artifact identity | Replaced | Independent mod and distribution identity |
-| Settings UI and selected-endpoint controller | Removed | This mod requires no in-game UI or virtual endpoint; BepInEx settings control enablement and unavailable-host fallback |
+| Settings UI and selected-endpoint controller | Removed | This mod does not expose endpoint selection; BepInEx settings control enablement and unavailable-host fallback |
 | Game-side WASAPI renderer | Replaced | Audio must render in a distinct OBS-selectable process |
 | Core queues and lifecycle leases | Reused and extended | Proven portable concurrency primitives now feed pipe frames |
 | Companion process, protocol, peer identity, process-tree check, tests, and package configuration | Added | Required by process-capture separation and configurable unavailable-host behavior |
