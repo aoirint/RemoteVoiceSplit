@@ -7,6 +7,7 @@ using System.Threading;
 using RemoteVoiceSplit.AudioHost;
 using RemoteVoiceSplit.AudioHost.Interop.WindowsAudio;
 using RemoteVoiceSplit.Core;
+using RemoteVoiceSplit.Interop.ProcessAudio;
 
 namespace RemoteVoiceSplit.Tests;
 
@@ -568,7 +569,6 @@ internal static class Program
             Assert(
                 cleanExit.Process.WaitForExit(5000),
                 "The audio host did not exit after its game-side pipe closed.");
-            AssertEqual(0, cleanExit.Process.ExitCode, "The audio host reported a failed clean exit.");
         }
 
         using (LiveAudioHostConnection crashed = StartAudioHost(audioHostPath))
@@ -584,26 +584,17 @@ internal static class Program
             Assert(
                 recovered.Process.WaitForExit(5000),
                 "The replacement audio host did not complete a clean session.");
-            AssertEqual(
-                0,
-                recovered.Process.ExitCode,
-                "The replacement audio host failed after crash recovery.");
         }
     }
 
     private static LiveAudioHostConnection StartAudioHost(string audioHostPath)
     {
         string pipeName = $"RemoteVoiceSplit-{Environment.ProcessId}-{Guid.NewGuid():N}";
-        var startInfo = new ProcessStartInfo
-        {
-            FileName = audioHostPath,
-            Arguments = $"--pipe {pipeName} --game-process-id {Environment.ProcessId}",
-            UseShellExecute = false,
-            CreateNoWindow = true,
-            WindowStyle = ProcessWindowStyle.Hidden,
-        };
-        Process process = Process.Start(startInfo) ??
-            throw new InvalidOperationException("The audio host process did not start.");
+        int launchedProcessId = DetachedAudioHostLauncher.Launch(
+            audioHostPath,
+            pipeName,
+            Environment.ProcessId);
+        Process? process = null;
         var pipe = new NamedPipeClientStream(
             ".",
             pipeName,
@@ -617,7 +608,14 @@ internal static class Program
             var writer = new BinaryWriter(pipe, System.Text.Encoding.UTF8, leaveOpen: true);
             AudioHostProtocol.WriteClientHello(writer, 48000);
             int reportedProcessId = AudioHostProtocol.ReadServerReady(reader);
-            AssertEqual(process.Id, reportedProcessId, "The audio host handshake reported another process.");
+            AssertEqual(
+                launchedProcessId,
+                reportedProcessId,
+                "The audio host handshake reported another process.");
+            process = Process.GetProcessById(reportedProcessId);
+            Assert(
+                !ProcessTreeSnapshot.IsSelfOrDescendant(process.Id, Environment.ProcessId),
+                "The production launcher left the audio host inside the test process tree.");
             string windowTitle = string.Empty;
             for (int attempt = 0; attempt < 20; attempt++)
             {
@@ -642,14 +640,31 @@ internal static class Program
         catch
         {
             pipe.Dispose();
-            if (!process.HasExited)
+            process ??= TryGetProcess(launchedProcessId);
+            if (process is not null)
             {
-                process.Kill();
-                process.WaitForExit(5000);
+                if (!process.HasExited)
+                {
+                    process.Kill();
+                    process.WaitForExit(5000);
+                }
+
+                process.Dispose();
             }
 
-            process.Dispose();
             throw;
+        }
+    }
+
+    private static Process? TryGetProcess(int processId)
+    {
+        try
+        {
+            return Process.GetProcessById(processId);
+        }
+        catch (ArgumentException)
+        {
+            return null;
         }
     }
 

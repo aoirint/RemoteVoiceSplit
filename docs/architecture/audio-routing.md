@@ -2,7 +2,8 @@
 
 This design depends on [Lethal Company voice playback](../domain/lethal-company-voice-playback.md),
 [OBS process audio capture](../domain/obs-process-audio-capture.md), and the
-[Windows Core Audio contract](../domain/windows-core-audio.md).
+[Windows Core Audio contract](../domain/windows-core-audio.md). Host launch
+also depends on [Windows process creation](../domain/windows-process-creation.md).
 
 ## Invariants
 
@@ -48,10 +49,17 @@ zero-length frame is a heartbeat.
 ## Process separation
 
 Launching the host as a direct child of Lethal Company would let an OBS capture
-of the game include the host's audio. The plugin therefore asks the Windows
-shell to start the host. That launch method is not trusted as proof: after the
-host returns its PID, the plugin snapshots the process tree and rejects the
-session when the host is the game or one of its descendants.
+of the game include the host's audio. The plugin therefore identifies the
+interactive Windows Explorer shell, verifies its image path, and uses native
+extended process creation to make that shell the host's parent. This avoids
+managed COM activation, which is not available in the target Unity Mono
+runtime.
+
+The launch result is not trusted as proof. The host returns its PID during the
+named-pipe handshake. The plugin requires the returned PID to equal the actual
+pipe server, requires the server image to equal the packaged host path, then
+snapshots the process tree and rejects the session when the host is the game or
+one of its descendants.
 
 The host window is minimized and titled
 `Lethal Company Remote Voice Split`. Closing the window closes the pipe and
@@ -87,6 +95,8 @@ epoch after recovery. Its optional live-audio suite additionally:
   ID through its internal endpoint provider;
 - verifies that the production failure callback retires destructive routing;
 - starts a replacement renderer on the current endpoint;
+- launches the production host with Windows Explorer as its verified parent
+  and checks that it is outside the test process tree;
 - closes a real audio-host pipe and checks normal process exit; and
 - kills a real audio-host process, observes the broken pipe, and completes a
   new host handshake.

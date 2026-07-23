@@ -142,7 +142,7 @@ internal sealed class VoiceProcessRouter : IDisposable
     private void RunSession()
     {
         string pipeName = $"RemoteVoiceSplit-{_gameProcessId}-{Guid.NewGuid():N}";
-        ShellAudioHostLauncher.Launch(_audioHostPath, pipeName, _gameProcessId);
+        DetachedAudioHostLauncher.Launch(_audioHostPath, pipeName, _gameProcessId);
 
         using var pipe = new NamedPipeClientStream(
             ".",

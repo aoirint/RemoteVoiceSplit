@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Fixed
+
+- Fixed audio-host startup under the Unity Mono runtime while keeping the host
+  outside the Lethal Company process tree for OBS capture.
+
 ### Added
 
 - Routes other players' voices through a separate OBS-capturable process.

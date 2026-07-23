@@ -26,6 +26,9 @@
     <Compile Include="..\RemoteVoiceSplit\Core\RoutingSessionGate.cs" Link="Core\RoutingSessionGate.cs" />
     <Compile Include="..\RemoteVoiceSplit\Core\VoiceCaptureStream.cs" Link="Core\VoiceCaptureStream.cs" />
     <Compile Include="..\RemoteVoiceSplit\Core\VoiceAudioMixer.cs" Link="Core\VoiceAudioMixer.cs" />
+    <Compile Include="..\RemoteVoiceSplit\Interop\ProcessAudio\ProcessImagePath.cs" Link="Interop\ProcessAudio\ProcessImagePath.cs" />
+    <Compile Include="..\RemoteVoiceSplit\Interop\ProcessAudio\ProcessTreeSnapshot.cs" Link="Interop\ProcessAudio\ProcessTreeSnapshot.cs" />
+    <Compile Include="..\RemoteVoiceSplit\Interop\ProcessAudio\DetachedAudioHostLauncher.cs" Link="Interop\ProcessAudio\DetachedAudioHostLauncher.cs" />
     <Compile Include="..\RemoteVoiceSplit.AudioHost\AudioHostWindowIdentity.cs" Link="AudioHost\AudioHostWindowIdentity.cs" />
     <Compile Include="..\RemoteVoiceSplit.AudioHost\AudioOutputPump.cs" Link="AudioHost\AudioOutputPump.cs" />
     <Compile Include="..\RemoteVoiceSplit.AudioHost\PcmAudioBuffer.cs" Link="AudioHost\PcmAudioBuffer.cs" />

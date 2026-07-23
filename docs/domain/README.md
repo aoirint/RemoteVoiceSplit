@@ -10,6 +10,8 @@ of the mod.
   loopback, process trees, and capture-window identity.
 - [Windows Core Audio](windows-core-audio.md) covers endpoint identity, render
   format, COM ownership, and failure behavior.
+- [Windows process creation](windows-process-creation.md) covers desktop-shell
+  identity, explicit parent selection, and executable-path-safe launch.
 - [Dependency baseline](dependencies.md) covers NuGet sources, versions,
   distribution roles, and adoption review.
 - [GitHub automation dependencies](github-automation.md) covers pinned Actions,
