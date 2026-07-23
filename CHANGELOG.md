@@ -8,6 +8,10 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unreleased]
 
+### Changed
+
+- Replaced the package artwork with the repository-family text icon style.
+
 ## [0.1.0-alpha.3] - 2026-07-23
 
 ### Added

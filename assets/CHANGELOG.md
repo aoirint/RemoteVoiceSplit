@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Changed
+
+- Replaced the package artwork with a black-and-white text icon.
+
 ## v0.1.0-alpha.3 - 2026-07-23
 
 ### Added
