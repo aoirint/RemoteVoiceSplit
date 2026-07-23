@@ -94,11 +94,12 @@ internal static class Program
             RetirementWaitsForActiveCommit();
             RoutingRetirementWaitsForActiveSubmissions();
             RemoteVoiceSelectionCoversSupportedGamePaths();
+            DisabledModPreservesUnityOutput();
             RemoteVoiceFallbackDefaultsToSilence();
             RoutingSessionRetiresAndRecovers();
             PluginRuntimeSurvivesComponentDestruction(assemblyPath);
             PluginConfigurationDefaultsToSilentFallback(assemblyPath);
-            PluginConfigurationUpdatesFallbackLive(assemblyPath);
+            PluginConfigurationUpdatesLive(assemblyPath);
             VoiceFallbackBoundaryUsesPolicy(assemblyPath);
             AudioHostWindowTitleIsStable();
             AudioHostProtocolRoundTrips();
@@ -529,29 +530,48 @@ internal static class Program
                 method.Name,
                 "Awake",
                 StringComparison.Ordinal));
-        Instruction bind = awake.Body.Instructions.Single(
+        Instruction[] binds = awake.Body.Instructions.Where(
             instruction =>
                 instruction.Operand is GenericInstanceMethod called &&
                 string.Equals(
                     called.DeclaringType.FullName,
                     "BepInEx.Configuration.ConfigFile",
                     StringComparison.Ordinal) &&
-                string.Equals(called.Name, "Bind", StringComparison.Ordinal));
+                string.Equals(called.Name, "Bind", StringComparison.Ordinal))
+            .ToArray();
 
         Assert(
-            string.Equals(
-                bind.Previous?.Previous?.Previous?.Previous?.Operand as string,
-                "Audio",
-                StringComparison.Ordinal),
-            "The fallback setting was not bound in the Audio section.");
+            binds.Length == 2,
+            "The plugin did not bind exactly the supported public settings.");
         Assert(
             string.Equals(
-                bind.Previous?.Previous?.Previous?.Operand as string,
+                binds[0].Previous?.Previous?.Previous?.Previous?.Operand as string,
+                "General",
+                StringComparison.Ordinal),
+            "The enabled setting was not bound in the General section.");
+        Assert(
+            string.Equals(
+                binds[0].Previous?.Previous?.Previous?.Operand as string,
+                "Enabled",
+                StringComparison.Ordinal),
+            "The enabled setting key changed.");
+        Assert(
+            binds[0].Previous?.Previous?.OpCode.Code == Code.Ldc_I4_1,
+            "The enabled setting did not default to true.");
+        Assert(
+            string.Equals(
+                binds[1].Previous?.Previous?.Previous?.Previous?.Operand as string,
+                "General",
+                StringComparison.Ordinal),
+            "The fallback setting was not bound in the General section.");
+        Assert(
+            string.Equals(
+                binds[1].Previous?.Previous?.Previous?.Operand as string,
                 "FallbackToGameOutput",
                 StringComparison.Ordinal),
             "The fallback setting key changed.");
         Assert(
-            bind.Previous?.Previous?.OpCode.Code == Code.Ldc_I4_0,
+            binds[1].Previous?.Previous?.OpCode.Code == Code.Ldc_I4_0,
             "The fallback setting did not default to false.");
     }
 
@@ -572,13 +592,19 @@ internal static class Program
         Assert(
             Calls(
                 callback,
-                "RemoteVoiceSplit.Core.RemoteVoiceFallbackPolicy",
+                "RemoteVoiceSplit.Core.RemoteVoiceOutputPolicy",
                 "ShouldClearUnityOutput"),
             "The Unity audio callback did not apply the fallback policy.");
         Assert(
             Calls(
                 callback,
-                "RemoteVoiceSplit.Core.RemoteVoiceFallbackState",
+                "RemoteVoiceSplit.Core.RemoteVoiceSettingsState",
+                "get_Enabled"),
+            "The Unity audio callback did not read the live enabled state.");
+        Assert(
+            Calls(
+                callback,
+                "RemoteVoiceSplit.Core.RemoteVoiceSettingsState",
                 "get_FallbackToGameOutput"),
             "The Unity audio callback did not read the live fallback state.");
         Assert(
@@ -594,53 +620,89 @@ internal static class Program
 
     private static void RemoteVoiceFallbackDefaultsToSilence()
     {
-        var fallback = new RemoteVoiceFallbackState(
-            RemoteVoiceFallbackPolicy.DefaultFallbackToGameOutput);
+        var fallback = new RemoteVoiceSettingsState(
+            RemoteVoiceOutputPolicy.DefaultEnabled,
+            RemoteVoiceOutputPolicy.DefaultFallbackToGameOutput);
         Assert(
             !fallback.FallbackToGameOutput,
             "Remote voice fallback did not default to silence.");
         Assert(
-            RemoteVoiceFallbackPolicy.ShouldClearUnityOutput(
+            RemoteVoiceOutputPolicy.ShouldClearUnityOutput(
+                enabled: fallback.Enabled,
                 submissionAccepted: false,
                 fallbackToGameOutput: fallback.FallbackToGameOutput),
             "Unavailable process routing did not silence Unity output by default.");
 
-        fallback.Update(fallbackToGameOutput: true);
+        fallback.Update(
+            enabled: true,
+            fallbackToGameOutput: true);
         Assert(
-            !RemoteVoiceFallbackPolicy.ShouldClearUnityOutput(
+            !RemoteVoiceOutputPolicy.ShouldClearUnityOutput(
+                enabled: fallback.Enabled,
                 submissionAccepted: false,
                 fallbackToGameOutput: fallback.FallbackToGameOutput),
             "The opt-out setting did not preserve Unity output while process routing was unavailable.");
         Assert(
-            RemoteVoiceFallbackPolicy.ShouldClearUnityOutput(
+            RemoteVoiceOutputPolicy.ShouldClearUnityOutput(
+                enabled: fallback.Enabled,
                 submissionAccepted: true,
                 fallbackToGameOutput: fallback.FallbackToGameOutput),
             "Accepted process routing did not clear Unity output when fallback was enabled.");
 
-        fallback.Update(fallbackToGameOutput: false);
+        fallback.Update(
+            enabled: true,
+            fallbackToGameOutput: false);
         Assert(
-            RemoteVoiceFallbackPolicy.ShouldClearUnityOutput(
+            RemoteVoiceOutputPolicy.ShouldClearUnityOutput(
+                enabled: fallback.Enabled,
                 submissionAccepted: true,
                 fallbackToGameOutput: fallback.FallbackToGameOutput),
             "Accepted process routing did not clear Unity output under the default setting.");
     }
 
-    private static void PluginConfigurationUpdatesFallbackLive(
+    private static void DisabledModPreservesUnityOutput()
+    {
+        var settings = new RemoteVoiceSettingsState(
+            enabled: false,
+            fallbackToGameOutput: false);
+
+        Assert(
+            !RemoteVoiceOutputPolicy.ShouldClearUnityOutput(
+                enabled: settings.Enabled,
+                submissionAccepted: false,
+                fallbackToGameOutput: settings.FallbackToGameOutput),
+            "A disabled mod silenced Unity output while routing was unavailable.");
+        Assert(
+            !RemoteVoiceOutputPolicy.ShouldClearUnityOutput(
+                enabled: settings.Enabled,
+                submissionAccepted: true,
+                fallbackToGameOutput: settings.FallbackToGameOutput),
+            "A disabled mod cleared Unity output despite a stale accepted submission.");
+    }
+
+    private static void PluginConfigurationUpdatesLive(
         string assemblyPath)
     {
         using ModuleDefinition module = ModuleDefinition.ReadModule(assemblyPath);
         TypeDefinition configuration = module.Types.Single(
             type => string.Equals(
                 type.FullName,
-                "RemoteVoiceSplit.Interop.Game.RemoteVoiceFallbackConfiguration",
+                "RemoteVoiceSplit.Interop.Game.RemoteVoiceConfiguration",
                 StringComparison.Ordinal));
         MethodDefinition constructor = configuration.Methods.Single(
             method => method.IsConstructor && !method.IsStatic);
-        MethodDefinition changed = configuration.Methods.Single(
+        MethodDefinition enabledChanged = configuration.Methods.Single(
             method => string.Equals(
                 method.Name,
-                "OnSettingChanged",
+                "OnEnabledSettingChanged",
                 StringComparison.Ordinal));
+        MethodDefinition fallbackChanged = configuration.Methods.Single(
+            method => string.Equals(
+                method.Name,
+                "OnFallbackSettingChanged",
+                StringComparison.Ordinal));
+        MethodDefinition apply = configuration.Methods.Single(
+            method => string.Equals(method.Name, "TryApply", StringComparison.Ordinal));
         MethodDefinition dispose = configuration.Methods.Single(
             method => string.Equals(
                 method.Name,
@@ -648,23 +710,51 @@ internal static class Program
                 StringComparison.Ordinal));
 
         Assert(
-            CallsGenericType(
-                constructor,
-                "BepInEx.Configuration.ConfigEntry`1",
-                "add_SettingChanged"),
-            "The fallback configuration did not subscribe to live setting changes.");
+            constructor.Body.Instructions.Count(
+                instruction =>
+                    instruction.OpCode.Code is Code.Call or Code.Callvirt &&
+                    instruction.Operand is MethodReference called &&
+                    string.Equals(
+                        called.DeclaringType.GetElementType().FullName,
+                        "BepInEx.Configuration.ConfigEntry`1",
+                        StringComparison.Ordinal) &&
+                    string.Equals(
+                        called.Name,
+                        "add_SettingChanged",
+                        StringComparison.Ordinal)) == 2,
+            "The configuration did not subscribe to both live setting changes.");
         Assert(
             Calls(
-                changed,
-                "RemoteVoiceSplit.Core.RemoteVoiceFallbackState",
+                apply,
+                "RemoteVoiceSplit.Core.RemoteVoiceSettingsState",
                 "Update"),
-            "A live setting change did not update the audio-thread fallback state.");
+            "A live setting change did not update the audio-thread configuration state.");
         Assert(
-            CallsGenericType(
-                dispose,
-                "BepInEx.Configuration.ConfigEntry`1",
-                "remove_SettingChanged"),
-            "Fallback configuration shutdown did not unsubscribe its setting handler.");
+            Calls(
+                enabledChanged,
+                "RemoteVoiceSplit.Interop.Game.RemoteVoiceConfiguration",
+                "TryApply"),
+            "A live enabled change did not apply the configuration state.");
+        Assert(
+            Calls(
+                fallbackChanged,
+                "RemoteVoiceSplit.Interop.Game.RemoteVoiceConfiguration",
+                "TryApply"),
+            "A live fallback change did not apply the configuration state.");
+        Assert(
+            dispose.Body.Instructions.Count(
+                instruction =>
+                    instruction.OpCode.Code is Code.Call or Code.Callvirt &&
+                    instruction.Operand is MethodReference called &&
+                    string.Equals(
+                        called.DeclaringType.GetElementType().FullName,
+                        "BepInEx.Configuration.ConfigEntry`1",
+                        StringComparison.Ordinal) &&
+                    string.Equals(
+                        called.Name,
+                        "remove_SettingChanged",
+                        StringComparison.Ordinal)) == 2,
+            "Configuration shutdown did not unsubscribe both setting handlers.");
     }
 
     private static void RoutingSessionRetiresAndRecovers()

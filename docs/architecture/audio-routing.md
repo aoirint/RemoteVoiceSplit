@@ -11,6 +11,8 @@ also depends on [Windows process creation](../domain/windows-process-creation.md
 
 - The local player's voice source is never registered.
 - Each remote source has one single-producer, single-consumer stereo queue.
+- When `General.Enabled` is `false`, filters preserve Unity output and submit
+  no new remote-voice blocks.
 - Unity samples are cleared after a complete callback block is committed to a
   verified ready session.
 - When a callback cannot enter a verified session, Unity samples are cleared by
@@ -42,16 +44,21 @@ float-stereo blocks. Mono input is duplicated; multichannel input uses the
 first two channels. Each source queue accepts a complete callback or rejects it
 atomically. The final mix is clamped to `[-1, 1]`.
 
-`Audio.FallbackToGameOutput` defaults to `false`. A BepInEx setting-change
-notification updates one atomic integer shared by the process sender and Unity
-audio callbacks. The callback therefore applies the new policy to its next
+`General.Enabled` defaults to `true`, and
+`General.FallbackToGameOutput` defaults to `false`. BepInEx setting-change
+notifications update atomic values shared by the process sender and Unity
+audio callbacks. The callback therefore applies either new policy to its next
 voice block without reattaching sources or restarting either process.
 
-When submission is unavailable or a source queue rejects a block, the default
-policy discards queued samples and clears the Unity block. With the setting
-enabled, an unavailable block remains on Unity output. A successfully submitted
-block is always cleared from Unity. The mod does not watch external edits to
-the configuration file.
+When the mod is disabled, the callback discards queued process-audio samples,
+does not submit the current block, and preserves that block on Unity output.
+The process-lifetime integration remains initialized so the setting can be
+enabled again immediately. When the mod is enabled but submission is
+unavailable or a source queue rejects a block, the default policy discards
+queued samples and clears the Unity block. With fallback enabled, an
+unavailable block remains on Unity output. A successfully submitted block is
+always cleared from Unity. The mod does not watch external edits to the
+configuration file.
 
 The pipe name combines the game PID and a cryptographically random session
 identifier. The handshake validates protocol magic, version, sample rate,

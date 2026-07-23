@@ -13,7 +13,7 @@ internal static class PluginRuntime
     private static Harmony? _harmony;
     private static ManualLogSource? _logger;
     private static VoiceProcessRouter? _router;
-    private static RemoteVoiceFallbackConfiguration? _fallbackConfiguration;
+    private static RemoteVoiceConfiguration? _configuration;
     private static bool _initialized;
 
     public static bool Initialize(
@@ -21,11 +21,17 @@ internal static class PluginRuntime
         int sampleRate,
         int gameProcessId,
         string audioHostPath,
+        ConfigEntry<bool> enabled,
         ConfigEntry<bool> fallbackToGameOutput)
     {
         if (logger is null)
         {
             throw new ArgumentNullException(nameof(logger));
+        }
+
+        if (enabled is null)
+        {
+            throw new ArgumentNullException(nameof(enabled));
         }
 
         if (fallbackToGameOutput is null)
@@ -42,10 +48,11 @@ internal static class PluginRuntime
 
             VoiceProcessRouter? router = null;
             Harmony? harmony = null;
-            RemoteVoiceFallbackConfiguration? fallbackConfiguration = null;
+            RemoteVoiceConfiguration? configuration = null;
             try
             {
-                fallbackConfiguration = new RemoteVoiceFallbackConfiguration(
+                configuration = new RemoteVoiceConfiguration(
+                    enabled,
                     fallbackToGameOutput,
                     logger);
                 router = new VoiceProcessRouter(
@@ -53,11 +60,11 @@ internal static class PluginRuntime
                     sampleRate,
                     gameProcessId,
                     audioHostPath,
-                    fallbackConfiguration.State);
+                    configuration.State);
                 IntegrationContext.Initialize(
                     logger,
                     router,
-                    fallbackConfiguration.State);
+                    configuration.State);
 
                 harmony = new Harmony(MyPluginInfo.PLUGIN_GUID);
                 harmony.PatchAll(typeof(Plugin).Assembly);
@@ -65,7 +72,7 @@ internal static class PluginRuntime
                 _logger = logger;
                 _router = router;
                 _harmony = harmony;
-                _fallbackConfiguration = fallbackConfiguration;
+                _configuration = configuration;
                 Application.quitting += OnApplicationQuitting;
                 _initialized = true;
                 return true;
@@ -75,11 +82,11 @@ internal static class PluginRuntime
                 IntegrationContext.Clear();
                 TryUnpatch(harmony, logger);
                 TryDisposeRouter(router, logger);
-                TryDisposeFallbackConfiguration(fallbackConfiguration, logger);
+                TryDisposeConfiguration(configuration, logger);
                 _harmony = null;
                 _router = null;
                 _logger = null;
-                _fallbackConfiguration = null;
+                _configuration = null;
                 throw;
             }
         }
@@ -99,12 +106,12 @@ internal static class PluginRuntime
             ManualLogSource? logger = _logger;
             Harmony? harmony = _harmony;
             VoiceProcessRouter? router = _router;
-            RemoteVoiceFallbackConfiguration? fallbackConfiguration =
-                _fallbackConfiguration;
+            RemoteVoiceConfiguration? configuration =
+                _configuration;
             _harmony = null;
             _router = null;
             _logger = null;
-            _fallbackConfiguration = null;
+            _configuration = null;
 
             TryLog(
                 logger,
@@ -113,7 +120,7 @@ internal static class PluginRuntime
             IntegrationContext.Clear();
             TryUnpatch(harmony, logger);
             TryDisposeRouter(router, logger);
-            TryDisposeFallbackConfiguration(fallbackConfiguration, logger);
+            TryDisposeConfiguration(configuration, logger);
         }
     }
 
@@ -151,20 +158,20 @@ internal static class PluginRuntime
         }
     }
 
-    private static void TryDisposeFallbackConfiguration(
-        RemoteVoiceFallbackConfiguration? fallbackConfiguration,
+    private static void TryDisposeConfiguration(
+        RemoteVoiceConfiguration? configuration,
         ManualLogSource? logger)
     {
         try
         {
-            fallbackConfiguration?.Dispose();
+            configuration?.Dispose();
         }
         catch (Exception exception)
         {
             TryLog(
                 logger,
                 LogLevel.Warning,
-                $"Fallback-configuration cleanup failed during application shutdown: {exception.GetType().Name}: {exception.Message}");
+                $"Configuration cleanup failed during application shutdown: {exception.GetType().Name}: {exception.Message}");
         }
     }
 

@@ -11,12 +11,12 @@ internal sealed class VoiceCaptureFilter : MonoBehaviour
 
     public void Initialize(
         VoiceProcessRouter router,
-        RemoteVoiceFallbackState fallback)
+        RemoteVoiceSettingsState settings)
     {
         CaptureRegistration? current = _registration.Read();
         if (current is not null &&
             ReferenceEquals(current.Router, router) &&
-            ReferenceEquals(current.Fallback, fallback))
+            ReferenceEquals(current.Settings, settings))
         {
             enabled = true;
             return;
@@ -26,7 +26,7 @@ internal sealed class VoiceCaptureFilter : MonoBehaviour
         var registration = new CaptureRegistration(
             router,
             router.RegisterCapture(),
-            fallback);
+            settings);
         _registration.Exchange(registration);
         enabled = true;
     }
@@ -50,11 +50,19 @@ internal sealed class VoiceCaptureFilter : MonoBehaviour
             return;
         }
 
+        bool enabled = registration.Settings.Enabled;
+        if (!enabled)
+        {
+            registration.Stream.Clear();
+            return;
+        }
+
         using RoutingSubmissionLease? submission = registration.Router.TrySubmit(registration.Stream, data, channels);
         bool submissionAccepted = submission is not null;
-        if (!RemoteVoiceFallbackPolicy.ShouldClearUnityOutput(
+        if (!RemoteVoiceOutputPolicy.ShouldClearUnityOutput(
+                enabled,
                 submissionAccepted,
-                registration.Fallback.FallbackToGameOutput))
+                registration.Settings.FallbackToGameOutput))
         {
             return;
         }
@@ -96,18 +104,18 @@ internal sealed class VoiceCaptureFilter : MonoBehaviour
         public CaptureRegistration(
             VoiceProcessRouter router,
             VoiceCaptureStream stream,
-            RemoteVoiceFallbackState fallback)
+            RemoteVoiceSettingsState settings)
         {
             Router = router;
             Stream = stream;
-            Fallback = fallback;
+            Settings = settings;
         }
 
         public VoiceProcessRouter Router { get; }
 
         public VoiceCaptureStream Stream { get; }
 
-        public RemoteVoiceFallbackState Fallback { get; }
+        public RemoteVoiceSettingsState Settings { get; }
 
         public AtomicCommitLease CommitLease { get; } = new();
     }

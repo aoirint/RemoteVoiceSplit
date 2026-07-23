@@ -76,11 +76,14 @@ a clean BepInEx 5 profile:
   disconnect an endpoint; remote voice must become silent by default and
   recover without stale replay or a game crash;
 - repeat the failure checks with
-  `Audio.FallbackToGameOutput` enabled; remote voice must
+  `General.FallbackToGameOutput` enabled; remote voice must
   remain on Unity output and recover;
-- toggle `Audio.FallbackToGameOutput` through a BepInEx configuration UI while
+- toggle `General.FallbackToGameOutput` through a BepInEx configuration UI while
   routing is unavailable; the next remote-voice block must change paths
-  without a restart; and
+  without a restart;
+- toggle `General.Enabled` through a BepInEx configuration UI while routing is
+  ready; disabled voice must remain on Unity output and re-enabled voice must
+  resume separate routing without a restart; and
 - exit the game and confirm the helper and its audio session stop.
 
 Also verify BepInExPack installation, Thunderstore packaging, OBS monitoring,

@@ -13,7 +13,7 @@ internal static class VoicePlaybackIntegration
     public static void Refresh(
         object startOfRound,
         VoiceProcessRouter router,
-        RemoteVoiceFallbackState fallback)
+        RemoteVoiceSettingsState settings)
     {
         object? localPlayer = GameReflection.LocalPlayerControllerField.GetValue(startOfRound);
         if (localPlayer is null)
@@ -57,7 +57,7 @@ internal static class VoicePlaybackIntegration
             VoiceCaptureFilter filter = source.GetComponent<VoiceCaptureFilter>() ?? source.gameObject.AddComponent<VoiceCaptureFilter>();
             filter.Initialize(
                 router,
-                fallback);
+                settings);
         }
 
         VoiceCaptureFilter[] filters = UnityEngine.Object.FindObjectsOfType<VoiceCaptureFilter>(true);
@@ -106,7 +106,7 @@ internal static class RefreshPlayerVoicePlaybackObjectsPatch
                     VoicePlaybackIntegration.Refresh(
                         __instance,
                         routing.Router,
-                        routing.Fallback);
+                        routing.Settings);
                 }
             });
     }

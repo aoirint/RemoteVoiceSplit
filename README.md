@@ -40,23 +40,30 @@ Lethal Company/BepInEx/plugins/RemoteVoiceSplit/RemoteVoiceSplit.AudioHost.exe.c
 Do not rename or separate these files. Do not copy build-time BepInEx,
 Harmony, Unity, game, or .NET reference assemblies.
 
-## Configure fallback behavior
+## Configure
 
 BepInEx creates
 `BepInEx/config/com.aoirint.remotevoicesplit.cfg` after the first launch.
 The default is:
 
 ```ini
-[Audio]
+[General]
+Enabled = true
 FallbackToGameOutput = false
 ```
 
-Keep `false` for strict recording-track separation. Remote voices are
+Set `Enabled` to `false` to disable voice separation and keep remote voices on
+the normal game output. Keep `FallbackToGameOutput` at `false` for strict
+recording-track separation while the mod is enabled. Remote voices are
 inaudible whenever separate process output cannot accept them. Set it to
 `true` to fall back to `Lethal Company.exe` during those failures, accepting
-that remote voices can appear in the game-audio track. Changes made through a
-BepInEx configuration UI apply immediately to the next voice block. The mod
-does not watch external edits to the generated configuration file.
+that remote voices can appear in the game-audio track.
+
+Changes made through a BepInEx configuration UI apply immediately to the next
+voice block. Disabling the mod does not unload its process-lifetime integration;
+it keeps the routing infrastructure available so `Enabled` can be turned back
+on without restarting the game. The mod does not watch external edits to the
+generated configuration file.
 
 ## Configure OBS Studio
 
@@ -105,9 +112,10 @@ stable GitHub and Thunderstore publication remain disabled. See
   verify that OBS targets `RemoteVoiceSplit.AudioHost.exe`, and check that the
   source is not muted.
 - Remote voice remains in the game source: confirm that
-  `FallbackToGameOutput` is `false`. With `true`, the mod deliberately keeps
-  Unity output whenever separate process output cannot accept a voice block.
-  The first warning in the BepInEx log identifies that transition.
+  `General.Enabled` is `true` and `General.FallbackToGameOutput` is `false`.
+  With the mod disabled or fallback enabled, Unity deliberately keeps the
+  applicable remote-voice blocks. The first warning in the BepInEx log
+  identifies an unavailable-host transition.
 - Duplicate remote voice: do not capture global Desktop Audio alongside both
   application sources, and remove other voice-routing mods while testing.
 
