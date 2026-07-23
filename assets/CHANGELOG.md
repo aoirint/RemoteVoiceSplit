@@ -1,5 +1,18 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- Added `Audio.KeepVoiceOnGameOutputWhenHostUnavailable`. Set it to `true` and
+  restart the game to keep remote voice on the normal game output during
+  audio-host failures.
+
+### Changed
+
+- Remote voice is now silent by default while the separate audio host is
+  unavailable or recovering, keeping it out of the game-audio recording track.
+
 ## v0.1.0-alpha.1 - 2026-07-23
 
 ### Fixed

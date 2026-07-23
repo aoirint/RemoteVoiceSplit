@@ -30,10 +30,12 @@ not require a game installation, OBS, or active render endpoint.
 
 On a Windows development machine with an active default render endpoint, add
 `--live-audio` to the test arguments. This starts the production WASAPI pump
-and audio-host executable, then verifies endpoint-change failure, fail-open,
+and audio-host executable, then verifies endpoint-change retirement,
 Explorer-parent launch outside the test process tree, same-PID pipe
-reconnection, forced host termination, and crash recovery. The injected
-endpoint change does not alter the user's Windows default-device setting.
+reconnection, forced host termination, and crash recovery. Deterministic tests
+separately verify the default-silent and opt-out fallback decisions. The
+injected endpoint change does not alter the user's Windows default-device
+setting.
 
 Use `--live-audio-soak-seconds 60` instead of `--live-audio` to keep the first
 verified connection open for sixty seconds before exercising the remaining

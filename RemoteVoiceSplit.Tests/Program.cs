@@ -94,18 +94,21 @@ internal static class Program
             RetirementWaitsForActiveCommit();
             RoutingRetirementWaitsForActiveSubmissions();
             RemoteVoiceSelectionCoversSupportedGamePaths();
-            RoutingSessionFailsOpenAndRecovers();
+            RemoteVoiceFallbackDefaultsToSilence();
+            RoutingSessionRetiresAndRecovers();
             PluginRuntimeSurvivesComponentDestruction(assemblyPath);
+            PluginConfigurationDefaultsToSilentFallback(assemblyPath);
+            VoiceFallbackBoundaryUsesPolicy(assemblyPath);
             AudioHostWindowTitleIsStable();
             AudioHostProtocolRoundTrips();
             ProcessAncestryHandlesTreesAndCycles();
             PcmAudioBufferReadsAndClearsPartialFrames();
             Console.WriteLine(
-                "All deterministic routing, game-path, protocol, ancestry, and host-buffer tests passed.");
+                "All deterministic fallback, routing, game-path, protocol, ancestry, and host-buffer tests passed.");
 
             if (runLiveAudio)
             {
-                DefaultEndpointChangeFailsOpenAndRecovers();
+                DefaultEndpointChangeRetiresAndRecovers();
                 AudioHostReconnectCrashAndRestart(
                     audioHostPath,
                     TimeSpan.FromSeconds(liveAudioSoakSeconds));
@@ -492,7 +495,106 @@ internal static class Program
             message);
     }
 
-    private static void RoutingSessionFailsOpenAndRecovers()
+    private static void PluginConfigurationDefaultsToSilentFallback(
+        string assemblyPath)
+    {
+        using ModuleDefinition module = ModuleDefinition.ReadModule(assemblyPath);
+        TypeDefinition plugin = module.Types.Single(
+            type => string.Equals(
+                type.FullName,
+                "RemoteVoiceSplit.Plugin",
+                StringComparison.Ordinal));
+        MethodDefinition awake = plugin.Methods.Single(
+            method => string.Equals(
+                method.Name,
+                "Awake",
+                StringComparison.Ordinal));
+        Instruction bind = awake.Body.Instructions.Single(
+            instruction =>
+                instruction.Operand is GenericInstanceMethod called &&
+                string.Equals(
+                    called.DeclaringType.FullName,
+                    "BepInEx.Configuration.ConfigFile",
+                    StringComparison.Ordinal) &&
+                string.Equals(called.Name, "Bind", StringComparison.Ordinal));
+
+        Assert(
+            string.Equals(
+                bind.Previous?.Previous?.Previous?.Previous?.Operand as string,
+                "Audio",
+                StringComparison.Ordinal),
+            "The fallback setting was not bound in the Audio section.");
+        Assert(
+            string.Equals(
+                bind.Previous?.Previous?.Previous?.Operand as string,
+                "KeepVoiceOnGameOutputWhenHostUnavailable",
+                StringComparison.Ordinal),
+            "The fallback setting key changed.");
+        Assert(
+            bind.Previous?.Previous?.OpCode.Code == Code.Ldc_I4_0,
+            "The fallback setting did not default to false.");
+    }
+
+    private static void VoiceFallbackBoundaryUsesPolicy(string assemblyPath)
+    {
+        using ModuleDefinition module = ModuleDefinition.ReadModule(assemblyPath);
+        TypeDefinition filter = module.Types.Single(
+            type => string.Equals(
+                type.FullName,
+                "RemoteVoiceSplit.Interop.Game.VoiceCaptureFilter",
+                StringComparison.Ordinal));
+        MethodDefinition callback = filter.Methods.Single(
+            method => string.Equals(
+                method.Name,
+                "OnAudioFilterRead",
+                StringComparison.Ordinal));
+
+        Assert(
+            Calls(
+                callback,
+                "RemoteVoiceSplit.Core.RemoteVoiceFallbackPolicy",
+                "ShouldClearUnityOutput"),
+            "The Unity audio callback did not apply the fallback policy.");
+        Assert(
+            Calls(
+                callback,
+                "RemoteVoiceSplit.Core.VoiceCaptureStream",
+                "Clear"),
+            "The silent fallback did not discard queued remote voice.");
+        Assert(
+            Calls(callback, "System.Array", "Clear"),
+            "The silent fallback did not clear Unity output.");
+    }
+
+    private static void RemoteVoiceFallbackDefaultsToSilence()
+    {
+        Assert(
+            !RemoteVoiceFallbackPolicy.DefaultKeepVoiceOnGameOutputWhenHostUnavailable,
+            "Remote voice fallback did not default to silence.");
+        Assert(
+            RemoteVoiceFallbackPolicy.ShouldClearUnityOutput(
+                submissionAccepted: false,
+                keepVoiceOnGameOutputWhenHostUnavailable:
+                    RemoteVoiceFallbackPolicy.DefaultKeepVoiceOnGameOutputWhenHostUnavailable),
+            "Unavailable process routing did not silence Unity output by default.");
+        Assert(
+            !RemoteVoiceFallbackPolicy.ShouldClearUnityOutput(
+                submissionAccepted: false,
+                keepVoiceOnGameOutputWhenHostUnavailable: true),
+            "The opt-out setting did not preserve Unity output while process routing was unavailable.");
+        Assert(
+            RemoteVoiceFallbackPolicy.ShouldClearUnityOutput(
+                submissionAccepted: true,
+                keepVoiceOnGameOutputWhenHostUnavailable: false),
+            "Accepted process routing did not clear Unity output under the default setting.");
+        Assert(
+            RemoteVoiceFallbackPolicy.ShouldClearUnityOutput(
+                submissionAccepted: true,
+                keepVoiceOnGameOutputWhenHostUnavailable: true),
+            "Accepted process routing did not clear Unity output when fallback was enabled.");
+    }
+
+    private static void RoutingSessionRetiresAndRecovers()
     {
         var gate = new RoutingSessionGate();
         Assert(!gate.IsReady, "A routing session started ready before the host handshake.");
@@ -526,7 +628,7 @@ internal static class Program
         Assert(!gate.IsReady, "Host exit left destructive routing enabled.");
         Assert(
             gate.TryBeginSubmission() is null,
-            "Host exit did not fail open to Unity playback.");
+            "Host exit continued accepting process-audio submissions.");
 
         gate.Activate();
         RoutingSubmissionLease? recovered = gate.TryBeginSubmission();
@@ -596,7 +698,7 @@ internal static class Program
         AssertSequence(new[] { 0f, 0f }, second, "Empty host buffer did not render silence.");
     }
 
-    private static void DefaultEndpointChangeFailsOpenAndRecovers()
+    private static void DefaultEndpointChangeRetiresAndRecovers()
     {
         var gate = new RoutingSessionGate();
         gate.Activate();

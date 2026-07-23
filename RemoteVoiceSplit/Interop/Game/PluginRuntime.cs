@@ -18,7 +18,8 @@ internal static class PluginRuntime
         ManualLogSource logger,
         int sampleRate,
         int gameProcessId,
-        string audioHostPath)
+        string audioHostPath,
+        bool keepVoiceOnGameOutputWhenHostUnavailable)
     {
         if (logger is null)
         {
@@ -40,8 +41,12 @@ internal static class PluginRuntime
                     logger,
                     sampleRate,
                     gameProcessId,
-                    audioHostPath);
-                IntegrationContext.Initialize(logger, router);
+                    audioHostPath,
+                    keepVoiceOnGameOutputWhenHostUnavailable);
+                IntegrationContext.Initialize(
+                    logger,
+                    router,
+                    keepVoiceOnGameOutputWhenHostUnavailable);
 
                 harmony = new Harmony(MyPluginInfo.PLUGIN_GUID);
                 harmony.PatchAll(typeof(Plugin).Assembly);

@@ -25,10 +25,10 @@ process, tests, package contents, and user instructions are target-specific.
 | APM dependency set and full commit pins | Reused exactly | The same reviewed development Skills apply |
 | Event ownership, permissions, action pins, release classifier, checksums, and inert publication gate | Reused with target variables | Portable CI and supply-chain policy |
 | Project, plugin, assembly, package, repository, and artifact identity | Replaced | Independent mod and distribution identity |
-| Settings UI and selected-endpoint controller | Removed | This mod requires no in-game configuration or virtual endpoint |
+| Settings UI and selected-endpoint controller | Removed | This mod requires no in-game UI or virtual endpoint; one BepInEx setting controls unavailable-host fallback |
 | Game-side WASAPI renderer | Replaced | Audio must render in a distinct OBS-selectable process |
 | Core queues and lifecycle leases | Reused and extended | Proven portable concurrency primitives now feed pipe frames |
-| Companion process, protocol, peer identity, process-tree check, tests, and package configuration | Added | Required by process-capture separation and safe fail-open behavior |
+| Companion process, protocol, peer identity, process-tree check, tests, and package configuration | Added | Required by process-capture separation and configurable unavailable-host behavior |
 | Domain and architecture documents | Reworked | OBS process trees replace endpoint selection as the governing external contract |
 
 ## Evidence ledger
@@ -70,16 +70,19 @@ the actual process ancestry. Routing becomes ready only when:
 4. the host has opened and started WASAPI rendering; and
 5. the host is not the game process or one of its descendants.
 
-If any condition fails, the plugin does not clear Unity's callback buffer.
-Remote voices therefore remain audible in the normal game output.
+If any condition fails, the plugin clears Unity's callback buffer by default,
+so remote voice does not leak into the game-audio track. Users can set
+`Audio.KeepVoiceOnGameOutputWhenHostUnavailable` to `true` and restart the
+game to preserve Unity output instead.
 
 The verified host PID remains stable across recoverable pipe and WASAPI
 failures. The host accepts a replacement session on the same unguessable pipe
-name, and both sides repeat their peer, image, and ancestry checks. The game
-side remains fail-open between the disconnect and the replacement ready
-message. After the first verified session, the host waits for reconnection
-until the verified game-process handle signals exit. This avoids treating slow
-Unity startup or scene transitions as permission to remove the OBS window.
+name, and both sides repeat their peer, image, and ancestry checks. Between a
+disconnect and the replacement ready message, the game side applies the
+startup-selected unavailable-host policy. After the first verified session,
+the host waits for reconnection until the verified game-process handle signals
+exit. This avoids treating slow Unity startup or scene transitions as
+permission to remove the OBS window.
 
 The game-side runtime likewise outlives the BepInEx component. `PluginRuntime`
 holds the Harmony instance, router, logger, and integration context in static
@@ -97,6 +100,8 @@ application-quit cleanup call path.
   complete target-game startup.
 - Physical default-endpoint changes, endpoint disconnection, and game-process
   crashes have not been observed.
+- Default-silent and opt-out fallback behavior have not been observed with a
+  remote player in the target game.
 - Publication credentials and namespace authorization are not configured.
 
 These blockers prevent a compatibility approval, stable GitHub Release, or
@@ -112,8 +117,9 @@ deterministic implementation, or package validation.
   host-buffer, managed-identity, and package mutation tests pass.
 - The completed eight-file ZIP passes the production archive validator.
 - A local Windows live test started the default-endpoint WASAPI renderer,
-  exercised its endpoint-change failure callback, proved fail-open routing,
-  and started a replacement renderer.
+  exercised its endpoint-change retirement callback, and started a replacement
+  renderer. Deterministic policy tests cover default-silent and opt-out
+  decisions.
 - Local live audio-host tests used the production native launcher, verified the
   Windows Explorer image before launch, proved the host was outside the test
   process tree, held one connection for sixty seconds, kept the host alive for

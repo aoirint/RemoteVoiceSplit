@@ -10,11 +10,13 @@ also depends on [Windows process creation](../domain/windows-process-creation.md
 
 - The local player's voice source is never registered.
 - Each remote source has one single-producer, single-consumer stereo queue.
-- Unity samples are cleared only after a complete callback block is committed
-  to a verified ready session.
+- Unity samples are cleared after a complete callback block is committed to a
+  verified ready session.
+- When a callback cannot enter a verified session, Unity samples are cleared by
+  default. The fallback setting can preserve them instead.
 - The audio host must be neither the game process nor its descendant.
 - Host launch, handshake, transport, ancestry, endpoint, or render failure
-  restores normal Unity voice output.
+  silences remote voice by default.
 - The Unity audio callback performs no COM calls, reflection, process
   enumeration, allocation, or logging.
 
@@ -30,13 +32,20 @@ flowchart LR
     P --> H["RemoteVoiceSplit.AudioHost.exe"]
     H --> W["Shared-mode WASAPI"]
     W --> E["Windows multimedia default"]
-    C -. "session unavailable: keep samples" .-> N["Normal Unity output"]
+    C -. "session unavailable: default" .-> S["Silence"]
+    C -. "setting enabled" .-> N["Normal Unity output"]
 ```
 
 The game-side writer mixes all registered sources into fixed ten-millisecond
 float-stereo blocks. Mono input is duplicated; multichannel input uses the
 first two channels. Each source queue accepts a complete callback or rejects it
 atomically. The final mix is clamped to `[-1, 1]`.
+
+`Audio.KeepVoiceOnGameOutputWhenHostUnavailable` is read once during plugin
+startup and defaults to `false`. When submission is unavailable or a source
+queue rejects a block, the default policy discards queued samples and clears
+the Unity block. With the setting enabled, an unavailable block remains on
+Unity output. A successfully submitted block is always cleared from Unity.
 
 The pipe name combines the game PID and a cryptographically random session
 identifier. The handshake validates protocol magic, version, sample rate,
@@ -68,12 +77,13 @@ immediately retires game-side readiness.
 
 The host process and window have game-process lifetime rather than connection
 lifetime. A pipe break, render failure, or default-endpoint change retires
-routing and restores Unity output, but the host keeps the same PID and waits
-for the plugin to reconnect. The replacement session revalidates the pipe peer,
-host image, and ancestry before it becomes ready. If the plugin does not
-reconnect immediately, the host keeps the OBS window available until the
-verified game process exits. The initial unconnected launch still has a bounded
-timeout so a failed startup does not leave a host behind.
+routing and applies the configured unavailable-host policy, but the host keeps
+the same PID and waits for the plugin to reconnect. The replacement session
+revalidates the pipe peer, host image, and ancestry before it becomes ready. If
+the plugin does not reconnect immediately, the host keeps the OBS window
+available until the verified game process exits. The initial unconnected
+launch still has a bounded timeout so a failed startup does not leave a host
+behind.
 
 ## Concurrency and lifecycle
 
@@ -97,16 +107,21 @@ ready only after `IAudioClient.Start` succeeds. A default-endpoint change,
 device error, or protocol error terminates only the current connection session.
 The plugin reconnects to the same host process after a bounded delay. A host
 close or crash permits a replacement process; game exit terminates the host.
-Until a replacement session is fully verified, later callbacks remain on Unity
-output.
+Until a replacement session is fully verified, later callbacks are silent by
+default or remain on Unity output when the fallback setting is enabled.
 
-This fail-open policy prioritizes audible communication over perfect
-separation during transitions. One transition block can be duplicated or
-dropped, but sustained silence and stale replay are forbidden.
+The default fail-closed policy prioritizes strict recording-track separation
+and can make remote communication inaudible during a host failure. The opt-out
+fail-open policy prioritizes audible communication but can place remote voice
+in the game-audio track. Queued data is discarded on failure under either
+policy, so recovery does not replay stale voice. A session can still fail after
+accepting one transition block, causing that block to be dropped under either
+policy.
 
 The deterministic harness exercises readiness retirement while an audio
-callback is active, rejection while unavailable, and activation of a new
-epoch after recovery. Its optional live-audio suite additionally:
+callback is active, default-silent and opt-out decisions while unavailable,
+and activation of a new epoch after recovery. Its optional live-audio suite
+additionally:
 
 - starts the production WASAPI pump and injects a changed multimedia endpoint
   ID through its internal endpoint provider;

@@ -23,9 +23,16 @@ track from `Lethal Company.exe`. No virtual audio device is required.
    recording tracks.
 
 The companion process uses the current Windows multimedia default output.
-When separate routing is unavailable, remote voice remains on the normal game
-output instead of being muted. Its OBS-selectable window remains available
-across temporary audio-device or connection recovery while the game runs.
+When separate routing is unavailable, remote voice is muted by default so it
+does not enter the game-audio track. Its OBS-selectable window remains
+available across temporary audio-device or connection recovery while the game
+runs.
+
+BepInEx creates
+`BepInEx/config/com.aoirint.remotevoicesplit.cfg` after the first launch.
+Set `[Audio] KeepVoiceOnGameOutputWhenHostUnavailable = true` and restart the
+game to keep remote voice audible through the normal game output during host
+failures. This opt-out can place remote voice in the game-audio track.
 
 Only clients that want separate remote-voice recording need this mod.
 

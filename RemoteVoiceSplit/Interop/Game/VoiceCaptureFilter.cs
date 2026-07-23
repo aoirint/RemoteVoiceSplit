@@ -9,17 +9,25 @@ internal sealed class VoiceCaptureFilter : MonoBehaviour
 {
     private readonly AtomicRegistration<CaptureRegistration> _registration = new();
 
-    public void Initialize(VoiceProcessRouter router)
+    public void Initialize(
+        VoiceProcessRouter router,
+        bool keepVoiceOnGameOutputWhenHostUnavailable)
     {
         CaptureRegistration? current = _registration.Read();
-        if (current is not null && ReferenceEquals(current.Router, router))
+        if (current is not null &&
+            ReferenceEquals(current.Router, router) &&
+            current.KeepVoiceOnGameOutputWhenHostUnavailable ==
+            keepVoiceOnGameOutputWhenHostUnavailable)
         {
             enabled = true;
             return;
         }
 
         Deactivate();
-        var registration = new CaptureRegistration(router, router.RegisterCapture());
+        var registration = new CaptureRegistration(
+            router,
+            router.RegisterCapture(),
+            keepVoiceOnGameOutputWhenHostUnavailable);
         _registration.Exchange(registration);
         enabled = true;
     }
@@ -44,9 +52,17 @@ internal sealed class VoiceCaptureFilter : MonoBehaviour
         }
 
         using RoutingSubmissionLease? submission = registration.Router.TrySubmit(registration.Stream, data, channels);
-        if (submission is null)
+        bool submissionAccepted = submission is not null;
+        if (!RemoteVoiceFallbackPolicy.ShouldClearUnityOutput(
+                submissionAccepted,
+                registration.KeepVoiceOnGameOutputWhenHostUnavailable))
         {
             return;
+        }
+
+        if (!submissionAccepted)
+        {
+            registration.Stream.Clear();
         }
 
         if (!registration.CommitLease.TryBegin())
@@ -78,15 +94,22 @@ internal sealed class VoiceCaptureFilter : MonoBehaviour
 
     private sealed class CaptureRegistration
     {
-        public CaptureRegistration(VoiceProcessRouter router, VoiceCaptureStream stream)
+        public CaptureRegistration(
+            VoiceProcessRouter router,
+            VoiceCaptureStream stream,
+            bool keepVoiceOnGameOutputWhenHostUnavailable)
         {
             Router = router;
             Stream = stream;
+            KeepVoiceOnGameOutputWhenHostUnavailable =
+                keepVoiceOnGameOutputWhenHostUnavailable;
         }
 
         public VoiceProcessRouter Router { get; }
 
         public VoiceCaptureStream Stream { get; }
+
+        public bool KeepVoiceOnGameOutputWhenHostUnavailable { get; }
 
         public AtomicCommitLease CommitLease { get; } = new();
     }

@@ -7,24 +7,29 @@ namespace RemoteVoiceSplit.Interop.Game;
 internal static class IntegrationContext
 {
     private static ManualLogSource? _logger;
-    private static VoiceProcessRouter? _router;
+    private static VoiceRoutingContext? _routing;
 
-    public static void Initialize(ManualLogSource logger, VoiceProcessRouter router)
+    public static void Initialize(
+        ManualLogSource logger,
+        VoiceProcessRouter router,
+        bool keepVoiceOnGameOutputWhenHostUnavailable)
     {
         _logger = logger;
-        _router = router;
+        _routing = new VoiceRoutingContext(
+            router,
+            keepVoiceOnGameOutputWhenHostUnavailable);
     }
 
     public static void Clear()
     {
-        _router = null;
+        _routing = null;
         _logger = null;
     }
 
-    public static bool TryGetRouter(out VoiceProcessRouter? router)
+    public static bool TryGetRouting(out VoiceRoutingContext? routing)
     {
-        router = _router;
-        return router is not null;
+        routing = _routing;
+        return routing is not null;
     }
 
     public static void RunGuarded(string operation, Action action)
@@ -50,4 +55,20 @@ internal static class IntegrationContext
             // Diagnostics are secondary to preserving the game callback.
         }
     }
+}
+
+internal sealed class VoiceRoutingContext
+{
+    public VoiceRoutingContext(
+        VoiceProcessRouter router,
+        bool keepVoiceOnGameOutputWhenHostUnavailable)
+    {
+        Router = router;
+        KeepVoiceOnGameOutputWhenHostUnavailable =
+            keepVoiceOnGameOutputWhenHostUnavailable;
+    }
+
+    public VoiceProcessRouter Router { get; }
+
+    public bool KeepVoiceOnGameOutputWhenHostUnavailable { get; }
 }

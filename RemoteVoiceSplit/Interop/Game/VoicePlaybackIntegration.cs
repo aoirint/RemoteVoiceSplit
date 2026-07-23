@@ -10,7 +10,10 @@ namespace RemoteVoiceSplit.Interop.Game;
 
 internal static class VoicePlaybackIntegration
 {
-    public static void Refresh(object startOfRound, VoiceProcessRouter router)
+    public static void Refresh(
+        object startOfRound,
+        VoiceProcessRouter router,
+        bool keepVoiceOnGameOutputWhenHostUnavailable)
     {
         object? localPlayer = GameReflection.LocalPlayerControllerField.GetValue(startOfRound);
         if (localPlayer is null)
@@ -52,7 +55,9 @@ internal static class VoicePlaybackIntegration
 
             routedSources.Add(source);
             VoiceCaptureFilter filter = source.GetComponent<VoiceCaptureFilter>() ?? source.gameObject.AddComponent<VoiceCaptureFilter>();
-            filter.Initialize(router);
+            filter.Initialize(
+                router,
+                keepVoiceOnGameOutputWhenHostUnavailable);
         }
 
         VoiceCaptureFilter[] filters = UnityEngine.Object.FindObjectsOfType<VoiceCaptureFilter>(true);
@@ -94,9 +99,14 @@ internal static class RefreshPlayerVoicePlaybackObjectsPatch
             "Remote voice source attachment",
             () =>
             {
-                if (IntegrationContext.TryGetRouter(out VoiceProcessRouter? router) && router is not null)
+                if (IntegrationContext.TryGetRouting(
+                        out VoiceRoutingContext? routing) &&
+                    routing is not null)
                 {
-                    VoicePlaybackIntegration.Refresh(__instance, router);
+                    VoicePlaybackIntegration.Refresh(
+                        __instance,
+                        routing.Router,
+                        routing.KeepVoiceOnGameOutputWhenHostUnavailable);
                 }
             });
     }

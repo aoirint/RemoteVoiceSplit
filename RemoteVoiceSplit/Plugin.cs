@@ -4,6 +4,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using BepInEx;
 using UnityEngine;
+using RemoteVoiceSplit.Core;
 using RemoteVoiceSplit.Interop.Game;
 
 namespace RemoteVoiceSplit;
@@ -22,6 +23,14 @@ public sealed class Plugin : BaseUnityPlugin
 
         try
         {
+            bool keepVoiceOnGameOutputWhenHostUnavailable = Config.Bind(
+                "Audio",
+                "KeepVoiceOnGameOutputWhenHostUnavailable",
+                RemoteVoiceFallbackPolicy.DefaultKeepVoiceOnGameOutputWhenHostUnavailable,
+                "Keep remote voices on the normal game output while the separate audio host is unavailable. " +
+                "The default false value prevents remote voice from leaking into the game-audio recording track, " +
+                "but also makes remote voice inaudible until the host recovers. Requires a game restart.").Value;
+
             int sampleRate = AudioSettings.outputSampleRate;
             if (sampleRate <= 0)
             {
@@ -36,7 +45,8 @@ public sealed class Plugin : BaseUnityPlugin
                 Logger,
                 sampleRate,
                 Process.GetCurrentProcess().Id,
-                audioHostPath);
+                audioHostPath,
+                keepVoiceOnGameOutputWhenHostUnavailable);
             if (initialized)
             {
                 Logger.LogInfo(

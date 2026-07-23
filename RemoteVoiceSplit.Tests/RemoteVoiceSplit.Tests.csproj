@@ -22,6 +22,7 @@
     <Compile Include="..\RemoteVoiceSplit\Core\AudioHostProtocol.cs" Link="Core\AudioHostProtocol.cs" />
     <Compile Include="..\RemoteVoiceSplit\Core\AudioRingBuffer.cs" Link="Core\AudioRingBuffer.cs" />
     <Compile Include="..\RemoteVoiceSplit\Core\ProcessAncestry.cs" Link="Core\ProcessAncestry.cs" />
+    <Compile Include="..\RemoteVoiceSplit\Core\RemoteVoiceFallbackPolicy.cs" Link="Core\RemoteVoiceFallbackPolicy.cs" />
     <Compile Include="..\RemoteVoiceSplit\Core\RemoteVoiceSelectionPolicy.cs" Link="Core\RemoteVoiceSelectionPolicy.cs" />
     <Compile Include="..\RemoteVoiceSplit\Core\RoutingSessionGate.cs" Link="Core\RoutingSessionGate.cs" />
     <Compile Include="..\RemoteVoiceSplit\Core\VoiceCaptureStream.cs" Link="Core\VoiceCaptureStream.cs" />

@@ -18,15 +18,16 @@ docs/
 ```
 
 `RemoteVoiceSplit/` is the BepInEx plugin. `Plugin.cs` owns only environment
-discovery and process-lifetime runtime initialization.
+discovery, BepInEx configuration binding, and process-lifetime runtime
+initialization.
 `Interop/Game/PluginRuntime.cs` owns the router, Harmony registration, static
 application-quit subscription, and transactional initialization cleanup.
 `Core/` owns framework-independent buffering, mixing, protocol framing,
-registration leases, and process-ancestry logic. `Interop/Game/` otherwise
-owns reflection and Unity callbacks. `Interop/ProcessAudio/` owns detached host
-launch, process-tree inspection, and named-pipe session control. Its launcher
-uses native Windows extended process creation rather than managed Shell COM
-activation.
+registration leases, unavailable-host policy, and process-ancestry logic.
+`Interop/Game/` otherwise owns reflection and Unity callbacks.
+`Interop/ProcessAudio/` owns detached host launch, process-tree inspection, and
+named-pipe session control. Its launcher uses native Windows extended process
+creation rather than managed Shell COM activation.
 
 `RemoteVoiceSplit.AudioHost/` is a Windows .NET Framework 4.8 executable. It
 owns the capture window, named-pipe server, bounded receive buffer, Core Audio

@@ -66,10 +66,13 @@ diagnostic sink have separate exception boundaries, so logging failure cannot
 escape into the game method.
 
 `OnAudioFilterRead` uses a captured registration and commit lease. It clears
-Unity's block only after the entire block was accepted by a verified ready
-routing epoch. Deactivation retires that registration and waits for an active
-commit before unregistering its queue. The audio callback performs no logging,
-reflection, COM work, process enumeration, or steady-state allocation.
+Unity's block after the entire block is accepted by a verified ready routing
+epoch. If submission is unavailable, it clears the block under the default
+silent policy or preserves it when
+`Audio.KeepVoiceOnGameOutputWhenHostUnavailable` is enabled. Deactivation
+retires that registration and waits for an active commit before unregistering
+its queue. The audio callback performs no logging, reflection, COM work,
+process enumeration, or steady-state allocation.
 
 This containment does not claim compatibility with arbitrary third-party
 transpilers or source replacements. Patch interaction remains part of the
