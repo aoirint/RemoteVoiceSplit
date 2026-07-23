@@ -6,6 +6,8 @@ of the mod.
 
 - [Lethal Company voice playback](lethal-company-voice-playback.md) covers
   voice assignment, playback assets, and runtime boundaries.
+- [BepInEx and Unity lifecycle](bepinex-unity-lifecycle.md) covers plugin
+  component ownership, destruction callbacks, and application-quit signaling.
 - [OBS process audio capture](obs-process-audio-capture.md) covers application
   loopback, process trees, and capture-window identity.
 - [Windows Core Audio](windows-core-audio.md) covers endpoint identity, render

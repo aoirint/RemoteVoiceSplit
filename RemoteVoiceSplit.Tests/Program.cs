@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Pipes;
+using System.Linq;
 using System.Threading;
+using Mono.Cecil;
+using Mono.Cecil.Cil;
 using RemoteVoiceSplit.AudioHost;
 using RemoteVoiceSplit.AudioHost.Interop.WindowsAudio;
 using RemoteVoiceSplit.Core;
@@ -92,6 +95,7 @@ internal static class Program
             RoutingRetirementWaitsForActiveSubmissions();
             RemoteVoiceSelectionCoversSupportedGamePaths();
             RoutingSessionFailsOpenAndRecovers();
+            PluginRuntimeSurvivesComponentDestruction(assemblyPath);
             AudioHostWindowTitleIsStable();
             AudioHostProtocolRoundTrips();
             ProcessAncestryHandlesTreesAndCycles();
@@ -128,6 +132,64 @@ internal static class Program
     private static void RejectsInvalidCapacity()
     {
         AssertThrows<ArgumentOutOfRangeException>(() => _ = new AudioRingBuffer(12));
+    }
+
+    private static void PluginRuntimeSurvivesComponentDestruction(string assemblyPath)
+    {
+        using ModuleDefinition module = ModuleDefinition.ReadModule(assemblyPath);
+        TypeDefinition plugin = module.Types.Single(
+            type => string.Equals(type.FullName, "RemoteVoiceSplit.Plugin", StringComparison.Ordinal));
+        Assert(
+            plugin.Methods.All(method => !string.Equals(method.Name, "OnDestroy", StringComparison.Ordinal)),
+            "The BepInEx component must not tear down process-lifetime routing from OnDestroy.");
+
+        TypeDefinition runtime = module.Types.Single(
+            type => string.Equals(
+                type.FullName,
+                "RemoteVoiceSplit.Interop.Game.PluginRuntime",
+                StringComparison.Ordinal));
+        MethodDefinition initialize = runtime.Methods.Single(
+            method => string.Equals(method.Name, "Initialize", StringComparison.Ordinal));
+        MethodDefinition quitting = runtime.Methods.Single(
+            method => string.Equals(
+                method.Name,
+                "OnApplicationQuitting",
+                StringComparison.Ordinal));
+
+        Assert(
+            Calls(initialize, "UnityEngine.Application", "add_quitting"),
+            "The process-lifetime runtime did not subscribe to the application quit event.");
+        Assert(
+            Calls(quitting, "RemoteVoiceSplit.Interop.Game.IntegrationContext", "Clear"),
+            "Application quit did not clear game integration.");
+
+        MethodDefinition unpatch = runtime.Methods.Single(
+            method => string.Equals(method.Name, "TryUnpatch", StringComparison.Ordinal));
+        Assert(
+            Calls(unpatch, "HarmonyLib.Harmony", "UnpatchSelf"),
+            "Application quit did not remove Harmony patches.");
+
+        MethodDefinition dispose = runtime.Methods.Single(
+            method => string.Equals(method.Name, "TryDispose", StringComparison.Ordinal));
+        Assert(
+            Calls(dispose, "RemoteVoiceSplit.Interop.ProcessAudio.VoiceProcessRouter", "Dispose"),
+            "Application quit did not stop the process-audio router.");
+    }
+
+    private static bool Calls(
+        MethodDefinition method,
+        string declaringType,
+        string methodName)
+    {
+        return method.Body.Instructions.Any(
+            instruction =>
+                instruction.OpCode.Code is Code.Call or Code.Callvirt &&
+                instruction.Operand is MethodReference called &&
+                string.Equals(
+                    called.DeclaringType.FullName,
+                    declaringType,
+                    StringComparison.Ordinal) &&
+                string.Equals(called.Name, methodName, StringComparison.Ordinal));
     }
 
     private static void ConvertsMonoAndPreservesWrappedOrder()

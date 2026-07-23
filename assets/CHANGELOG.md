@@ -9,6 +9,8 @@
 - Keeps the OBS-selectable audio-host window running while its audio connection
   recovers from a temporary failure.
 - Keeps waiting for recovery during slow game startup and scene transitions.
+- Keeps voice routing active when the BepInEx plugin component is destroyed
+  during game startup.
 
 ### Added
 

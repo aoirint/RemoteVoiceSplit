@@ -1,7 +1,9 @@
 # Game Integration Architecture
 
 This design assumes the base-game behavior documented under
-[Lethal Company voice playback](../domain/lethal-company-voice-playback.md).
+[Lethal Company voice playback](../domain/lethal-company-voice-playback.md)
+and the loader behavior documented under
+[BepInEx and Unity lifecycle](../domain/bepinex-unity-lifecycle.md).
 
 ## Compatibility boundary
 
@@ -14,6 +16,19 @@ leaving partial patches.
 The only Harmony patch is a postfix on the no-argument voice-playback refresh.
 Changing the supported game version requires reconfirming that exact overload
 and every reflected member before updating the compatibility claim.
+
+## Runtime ownership
+
+The BepInEx `Plugin` component initializes one static process-lifetime
+`PluginRuntime`. That runtime owns the Harmony instance, process-audio router,
+and `IntegrationContext`. Repeated component initialization is idempotent.
+
+Unity component destruction is not an unload boundary. The plugin therefore
+has no `OnDestroy` teardown. The runtime subscribes a static handler to
+`Application.quitting` and performs guarded, idempotent cleanup only from that
+application-level signal. If the game crashes before Unity sends the signal,
+the background router thread ends with the game process and the external host
+observes the verified game-process handle becoming signaled.
 
 ## Player and network role policy
 
