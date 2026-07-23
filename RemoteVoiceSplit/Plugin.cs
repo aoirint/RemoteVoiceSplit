@@ -24,10 +24,16 @@ public sealed class Plugin : BaseUnityPlugin
 
         try
         {
+            ConfigEntry<bool> enabled = Config.Bind(
+                "General",
+                "Enabled",
+                RemoteVoiceOutputPolicy.DefaultEnabled,
+                "Set to false to disable this mod. Changes made through BepInEx configuration APIs apply immediately.");
+
             ConfigEntry<bool> fallbackToGameOutput = Config.Bind(
-                "Audio",
+                "General",
                 "FallbackToGameOutput",
-                RemoteVoiceFallbackPolicy.DefaultFallbackToGameOutput,
+                RemoteVoiceOutputPolicy.DefaultFallbackToGameOutput,
                 "Keep remote voices on the normal game output whenever separate process output cannot accept them. " +
                 "The default false value prevents remote voice from leaking into the game-audio recording track, " +
                 "but also makes remote voice inaudible until separate output recovers. " +
@@ -48,6 +54,7 @@ public sealed class Plugin : BaseUnityPlugin
                 sampleRate,
                 Process.GetCurrentProcess().Id,
                 audioHostPath,
+                enabled,
                 fallbackToGameOutput);
             if (initialized)
             {

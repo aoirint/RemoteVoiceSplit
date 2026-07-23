@@ -8,6 +8,18 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unreleased]
 
+### Added
+
+- Added `General.Enabled`, defaulting to `true`, so users can disable voice
+  separation and preserve normal game output without uninstalling the mod.
+
+### Changed
+
+- Moved `FallbackToGameOutput` from `Audio` to `General` because it controls
+  routing failure policy rather than an audio-format or device parameter.
+- Applies both supported settings immediately when changed through a BepInEx
+  configuration API.
+
 ## [0.1.0-alpha.2] - 2026-07-23
 
 ### Added

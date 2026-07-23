@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+### Added
+
+- Added `[General] Enabled`. Set it to `false` to disable voice separation and
+  keep remote voices on the normal game output.
+
+### Changed
+
+- Moved `FallbackToGameOutput` from `[Audio]` to `[General]`.
+- Changes to both settings through a BepInEx configuration UI apply
+  immediately without restarting the game.
+
 ## v0.1.0-alpha.2 - 2026-07-23
 
 ### Added

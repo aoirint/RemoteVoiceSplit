@@ -13,12 +13,12 @@ internal static class IntegrationContext
     public static void Initialize(
         ManualLogSource logger,
         VoiceProcessRouter router,
-        RemoteVoiceFallbackState fallback)
+        RemoteVoiceSettingsState settings)
     {
         _logger = logger;
         _routing = new VoiceRoutingContext(
             router,
-            fallback);
+            settings);
     }
 
     public static void Clear()
@@ -62,13 +62,13 @@ internal sealed class VoiceRoutingContext
 {
     public VoiceRoutingContext(
         VoiceProcessRouter router,
-        RemoteVoiceFallbackState fallback)
+        RemoteVoiceSettingsState settings)
     {
         Router = router;
-        Fallback = fallback;
+        Settings = settings;
     }
 
     public VoiceProcessRouter Router { get; }
 
-    public RemoteVoiceFallbackState Fallback { get; }
+    public RemoteVoiceSettingsState Settings { get; }
 }

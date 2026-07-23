@@ -22,9 +22,9 @@ discovery, BepInEx configuration binding, and process-lifetime runtime
 initialization.
 `Interop/Game/PluginRuntime.cs` owns the router, Harmony registration, static
 application-quit subscription, and transactional initialization cleanup.
-`Interop/Game/RemoteVoiceFallbackConfiguration.cs` owns the BepInEx
-setting-change subscription and updates the atomic fallback state shared with
-the audio paths.
+`Interop/Game/RemoteVoiceConfiguration.cs` owns the BepInEx
+setting-change subscriptions and updates the atomic enabled and fallback state
+shared with the audio paths.
 `Core/` owns framework-independent buffering, mixing, protocol framing,
 registration leases, unavailable-host policy and state, and process-ancestry
 logic.

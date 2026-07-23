@@ -38,10 +38,12 @@ injected endpoint change does not alter the user's Windows default-device
 setting.
 
 For runtime configuration validation, make the process route unavailable and
-toggle `Audio.FallbackToGameOutput` through a BepInEx configuration UI. The
+toggle `General.FallbackToGameOutput` through a BepInEx configuration UI. The
 next remote-voice block must switch between silent and normal Unity output
-without source reattachment or a game restart. External edits to the generated
-configuration file are outside this live-update check.
+without source reattachment or a game restart. Toggle `General.Enabled` while
+routing is ready; disabled blocks must remain on Unity output and enabled
+blocks must resume separate routing without restarting. External edits to the
+generated configuration file are outside this live-update check.
 
 Use `--live-audio-soak-seconds 60` instead of `--live-audio` to keep the first
 verified connection open for sixty seconds before exercising the remaining

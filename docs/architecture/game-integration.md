@@ -67,9 +67,10 @@ escape into the game method.
 
 `OnAudioFilterRead` uses a captured registration and commit lease. It clears
 Unity's block after the entire block is accepted by a verified ready routing
-epoch. If submission is unavailable, it clears the block under the default
-silent policy or preserves it when
-`Audio.FallbackToGameOutput` is enabled. Deactivation
+epoch. When `General.Enabled` is `false`, it submits no new block and preserves
+Unity output. If submission is unavailable while enabled, it clears the block
+under the default silent policy or preserves it when
+`General.FallbackToGameOutput` is enabled. Deactivation
 retires that registration and waits for an active commit before unregistering
 its queue. The audio callback performs no logging, reflection, COM work,
 process enumeration, or steady-state allocation.
