@@ -2,9 +2,22 @@
 
 ## Unreleased
 
+## v0.1.0-alpha.4 - 2026-07-23
+
 ### Changed
 
 - Replaced the package artwork with a black-and-white text icon.
+
+### Notes
+
+- This alpha changes package artwork only. Complete two-player OBS track
+  separation, host/client and voice-path coverage, endpoint recovery, host
+  termination, and live configuration switching remain required before a
+  stable release.
+- Compatibility: Lethal Company v81.
+    - Steam Build ID: `22825947`
+    - Steam Manifest ID: `6423525044216269478`
+- Install the mod only on clients that want separate remote-voice recording.
 
 ## v0.1.0-alpha.3 - 2026-07-23
 

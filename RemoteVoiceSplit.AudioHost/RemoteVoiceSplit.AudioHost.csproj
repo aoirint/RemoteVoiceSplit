@@ -19,7 +19,7 @@
     <Product>Remote Voice Split Audio Host</Product>
     <Description>Renders remote Lethal Company voice audio as a separate OBS-capturable process.</Description>
     <!-- APP_VERSION_MARKER -->
-    <Version>0.1.0-alpha.3</Version>
+    <Version>0.1.0-alpha.4</Version>
     <Authors>aoirint</Authors>
     <Company>aoirint</Company>
     <RepositoryUrl>https://github.com/aoirint/RemoteVoiceSplit</RepositoryUrl>
