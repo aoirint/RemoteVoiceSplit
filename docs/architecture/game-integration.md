@@ -69,7 +69,7 @@ escape into the game method.
 Unity's block after the entire block is accepted by a verified ready routing
 epoch. If submission is unavailable, it clears the block under the default
 silent policy or preserves it when
-`Audio.KeepVoiceOnGameOutputWhenHostUnavailable` is enabled. Deactivation
+`Audio.FallbackToGameOutput` is enabled. Deactivation
 retires that registration and waits for an active commit before unregistering
 its queue. The audio callback performs no logging, reflection, COM work,
 process enumeration, or steady-state allocation.

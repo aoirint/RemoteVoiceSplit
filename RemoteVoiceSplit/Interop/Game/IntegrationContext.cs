@@ -12,12 +12,12 @@ internal static class IntegrationContext
     public static void Initialize(
         ManualLogSource logger,
         VoiceProcessRouter router,
-        bool keepVoiceOnGameOutputWhenHostUnavailable)
+        bool fallbackToGameOutput)
     {
         _logger = logger;
         _routing = new VoiceRoutingContext(
             router,
-            keepVoiceOnGameOutputWhenHostUnavailable);
+            fallbackToGameOutput);
     }
 
     public static void Clear()
@@ -61,14 +61,13 @@ internal sealed class VoiceRoutingContext
 {
     public VoiceRoutingContext(
         VoiceProcessRouter router,
-        bool keepVoiceOnGameOutputWhenHostUnavailable)
+        bool fallbackToGameOutput)
     {
         Router = router;
-        KeepVoiceOnGameOutputWhenHostUnavailable =
-            keepVoiceOnGameOutputWhenHostUnavailable;
+        FallbackToGameOutput = fallbackToGameOutput;
     }
 
     public VoiceProcessRouter Router { get; }
 
-    public bool KeepVoiceOnGameOutputWhenHostUnavailable { get; }
+    public bool FallbackToGameOutput { get; }
 }

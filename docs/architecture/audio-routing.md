@@ -41,7 +41,7 @@ float-stereo blocks. Mono input is duplicated; multichannel input uses the
 first two channels. Each source queue accepts a complete callback or rejects it
 atomically. The final mix is clamped to `[-1, 1]`.
 
-`Audio.KeepVoiceOnGameOutputWhenHostUnavailable` is read once during plugin
+`Audio.FallbackToGameOutput` is read once during plugin
 startup and defaults to `false`. When submission is unavailable or a source
 queue rejects a block, the default policy discards queued samples and clears
 the Unity block. With the setting enabled, an unavailable block remains on

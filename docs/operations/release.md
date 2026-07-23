@@ -76,7 +76,7 @@ a clean BepInEx 5 profile:
   disconnect an endpoint; remote voice must become silent by default and
   recover without stale replay or a game crash;
 - repeat the failure checks with
-  `Audio.KeepVoiceOnGameOutputWhenHostUnavailable` enabled; remote voice must
+  `Audio.FallbackToGameOutput` enabled; remote voice must
   remain on Unity output and recover; and
 - exit the game and confirm the helper and its audio session stop.
 

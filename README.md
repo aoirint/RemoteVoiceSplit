@@ -48,14 +48,14 @@ The default is:
 
 ```ini
 [Audio]
-KeepVoiceOnGameOutputWhenHostUnavailable = false
+FallbackToGameOutput = false
 ```
 
 Keep `false` for strict recording-track separation. Remote voices are
-inaudible while the audio host is unavailable or recovering. Set it to `true`
-to keep remote voices audible through `Lethal Company.exe` during those
-failures, accepting that they can appear in the game-audio track. Restart the
-game after changing this setting.
+inaudible whenever separate process output cannot accept them. Set it to
+`true` to fall back to `Lethal Company.exe` during those failures, accepting
+that remote voices can appear in the game-audio track. Restart the game after
+changing this setting.
 
 ## Configure OBS Studio
 
@@ -104,9 +104,9 @@ stable GitHub and Thunderstore publication remain disabled. See
   verify that OBS targets `RemoteVoiceSplit.AudioHost.exe`, and check that the
   source is not muted.
 - Remote voice remains in the game source: confirm that
-  `KeepVoiceOnGameOutputWhenHostUnavailable` is `false`. With `true`, the mod
-  deliberately keeps Unity output while the host is unavailable. The first
-  warning in the BepInEx log identifies that transition.
+  `FallbackToGameOutput` is `false`. With `true`, the mod deliberately keeps
+  Unity output whenever separate process output cannot accept a voice block.
+  The first warning in the BepInEx log identifies that transition.
 - Duplicate remote voice: do not capture global Desktop Audio alongside both
   application sources, and remove other voice-routing mods while testing.
 

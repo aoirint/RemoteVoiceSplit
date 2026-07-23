@@ -11,13 +11,12 @@ internal sealed class VoiceCaptureFilter : MonoBehaviour
 
     public void Initialize(
         VoiceProcessRouter router,
-        bool keepVoiceOnGameOutputWhenHostUnavailable)
+        bool fallbackToGameOutput)
     {
         CaptureRegistration? current = _registration.Read();
         if (current is not null &&
             ReferenceEquals(current.Router, router) &&
-            current.KeepVoiceOnGameOutputWhenHostUnavailable ==
-            keepVoiceOnGameOutputWhenHostUnavailable)
+            current.FallbackToGameOutput == fallbackToGameOutput)
         {
             enabled = true;
             return;
@@ -27,7 +26,7 @@ internal sealed class VoiceCaptureFilter : MonoBehaviour
         var registration = new CaptureRegistration(
             router,
             router.RegisterCapture(),
-            keepVoiceOnGameOutputWhenHostUnavailable);
+            fallbackToGameOutput);
         _registration.Exchange(registration);
         enabled = true;
     }
@@ -55,7 +54,7 @@ internal sealed class VoiceCaptureFilter : MonoBehaviour
         bool submissionAccepted = submission is not null;
         if (!RemoteVoiceFallbackPolicy.ShouldClearUnityOutput(
                 submissionAccepted,
-                registration.KeepVoiceOnGameOutputWhenHostUnavailable))
+                registration.FallbackToGameOutput))
         {
             return;
         }
@@ -97,19 +96,18 @@ internal sealed class VoiceCaptureFilter : MonoBehaviour
         public CaptureRegistration(
             VoiceProcessRouter router,
             VoiceCaptureStream stream,
-            bool keepVoiceOnGameOutputWhenHostUnavailable)
+            bool fallbackToGameOutput)
         {
             Router = router;
             Stream = stream;
-            KeepVoiceOnGameOutputWhenHostUnavailable =
-                keepVoiceOnGameOutputWhenHostUnavailable;
+            FallbackToGameOutput = fallbackToGameOutput;
         }
 
         public VoiceProcessRouter Router { get; }
 
         public VoiceCaptureStream Stream { get; }
 
-        public bool KeepVoiceOnGameOutputWhenHostUnavailable { get; }
+        public bool FallbackToGameOutput { get; }
 
         public AtomicCommitLease CommitLease { get; } = new();
     }

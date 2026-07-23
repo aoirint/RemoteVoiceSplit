@@ -527,7 +527,7 @@ internal static class Program
         Assert(
             string.Equals(
                 bind.Previous?.Previous?.Previous?.Operand as string,
-                "KeepVoiceOnGameOutputWhenHostUnavailable",
+                "FallbackToGameOutput",
                 StringComparison.Ordinal),
             "The fallback setting key changed.");
         Assert(
@@ -569,28 +569,28 @@ internal static class Program
     private static void RemoteVoiceFallbackDefaultsToSilence()
     {
         Assert(
-            !RemoteVoiceFallbackPolicy.DefaultKeepVoiceOnGameOutputWhenHostUnavailable,
+            !RemoteVoiceFallbackPolicy.DefaultFallbackToGameOutput,
             "Remote voice fallback did not default to silence.");
         Assert(
             RemoteVoiceFallbackPolicy.ShouldClearUnityOutput(
                 submissionAccepted: false,
-                keepVoiceOnGameOutputWhenHostUnavailable:
-                    RemoteVoiceFallbackPolicy.DefaultKeepVoiceOnGameOutputWhenHostUnavailable),
+                fallbackToGameOutput:
+                    RemoteVoiceFallbackPolicy.DefaultFallbackToGameOutput),
             "Unavailable process routing did not silence Unity output by default.");
         Assert(
             !RemoteVoiceFallbackPolicy.ShouldClearUnityOutput(
                 submissionAccepted: false,
-                keepVoiceOnGameOutputWhenHostUnavailable: true),
+                fallbackToGameOutput: true),
             "The opt-out setting did not preserve Unity output while process routing was unavailable.");
         Assert(
             RemoteVoiceFallbackPolicy.ShouldClearUnityOutput(
                 submissionAccepted: true,
-                keepVoiceOnGameOutputWhenHostUnavailable: false),
+                fallbackToGameOutput: false),
             "Accepted process routing did not clear Unity output under the default setting.");
         Assert(
             RemoteVoiceFallbackPolicy.ShouldClearUnityOutput(
                 submissionAccepted: true,
-                keepVoiceOnGameOutputWhenHostUnavailable: true),
+                fallbackToGameOutput: true),
             "Accepted process routing did not clear Unity output when fallback was enabled.");
     }
 

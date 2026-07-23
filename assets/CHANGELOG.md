@@ -4,9 +4,9 @@
 
 ### Added
 
-- Added `Audio.KeepVoiceOnGameOutputWhenHostUnavailable`. Set it to `true` and
-  restart the game to keep remote voice on the normal game output during
-  audio-host failures.
+- Added `Audio.FallbackToGameOutput`. Set it to `true` and restart the game to
+  keep remote voice on the normal game output when separate process output
+  cannot accept it.
 
 ### Changed
 

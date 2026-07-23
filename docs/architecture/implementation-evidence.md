@@ -72,8 +72,8 @@ the actual process ancestry. Routing becomes ready only when:
 
 If any condition fails, the plugin clears Unity's callback buffer by default,
 so remote voice does not leak into the game-audio track. Users can set
-`Audio.KeepVoiceOnGameOutputWhenHostUnavailable` to `true` and restart the
-game to preserve Unity output instead.
+`Audio.FallbackToGameOutput` to `true` and restart the game to preserve Unity
+output instead.
 
 The verified host PID remains stable across recoverable pipe and WASAPI
 failures. The host accepts a replacement session on the same unguessable pipe

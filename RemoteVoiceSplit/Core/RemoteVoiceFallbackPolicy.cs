@@ -2,12 +2,12 @@ namespace RemoteVoiceSplit.Core;
 
 internal static class RemoteVoiceFallbackPolicy
 {
-    public const bool DefaultKeepVoiceOnGameOutputWhenHostUnavailable = false;
+    public const bool DefaultFallbackToGameOutput = false;
 
     public static bool ShouldClearUnityOutput(
         bool submissionAccepted,
-        bool keepVoiceOnGameOutputWhenHostUnavailable)
+        bool fallbackToGameOutput)
     {
-        return submissionAccepted || !keepVoiceOnGameOutputWhenHostUnavailable;
+        return submissionAccepted || !fallbackToGameOutput;
     }
 }

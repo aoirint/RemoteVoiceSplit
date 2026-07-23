@@ -23,13 +23,13 @@ public sealed class Plugin : BaseUnityPlugin
 
         try
         {
-            bool keepVoiceOnGameOutputWhenHostUnavailable = Config.Bind(
+            bool fallbackToGameOutput = Config.Bind(
                 "Audio",
-                "KeepVoiceOnGameOutputWhenHostUnavailable",
-                RemoteVoiceFallbackPolicy.DefaultKeepVoiceOnGameOutputWhenHostUnavailable,
-                "Keep remote voices on the normal game output while the separate audio host is unavailable. " +
+                "FallbackToGameOutput",
+                RemoteVoiceFallbackPolicy.DefaultFallbackToGameOutput,
+                "Keep remote voices on the normal game output whenever separate process output cannot accept them. " +
                 "The default false value prevents remote voice from leaking into the game-audio recording track, " +
-                "but also makes remote voice inaudible until the host recovers. Requires a game restart.").Value;
+                "but also makes remote voice inaudible until separate output recovers. Requires a game restart.").Value;
 
             int sampleRate = AudioSettings.outputSampleRate;
             if (sampleRate <= 0)
@@ -46,7 +46,7 @@ public sealed class Plugin : BaseUnityPlugin
                 sampleRate,
                 Process.GetCurrentProcess().Id,
                 audioHostPath,
-                keepVoiceOnGameOutputWhenHostUnavailable);
+                fallbackToGameOutput);
             if (initialized)
             {
                 Logger.LogInfo(

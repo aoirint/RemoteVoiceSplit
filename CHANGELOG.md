@@ -10,14 +10,13 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Added
 
-- Added `Audio.KeepVoiceOnGameOutputWhenHostUnavailable` to let users retain
-  remote voice on the normal game output during audio-host failures.
+- Added `Audio.FallbackToGameOutput` to let users retain remote voice on the
+  normal game output when separate process output cannot accept it.
 
 ### Changed
 
-- Silences remote voice by default while the separate audio host is unavailable
-  or recovering, preventing it from leaking into the game-audio recording
-  track.
+- Silences remote voice by default whenever separate process output cannot
+  accept it, preventing it from leaking into the game-audio recording track.
 
 ## [0.1.0-alpha.1] - 2026-07-23
 
