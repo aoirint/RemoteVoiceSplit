@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## v0.1.0-alpha.1 - 2026-07-23
 
 ### Fixed
 
@@ -22,6 +22,9 @@
 
 ### Notes
 
+- This is an alpha GitHub release. The companion window has been observed
+  through game startup, but complete two-player OBS track-separation coverage
+  remains required before a stable release.
 - Compatibility: Lethal Company v81.
     - Steam Build ID: `22825947`
     - Steam Manifest ID: `6423525044216269478`

@@ -53,6 +53,7 @@ jobs:
       release_mode: ${{ steps.generate-version.outputs.release_mode }}
       project_version: ${{ steps.project-version.outputs.version }}
       artifact_version: ${{ steps.generate-version.outputs.app_version }}
+      manifest_version: ${{ steps.generate-version.outputs.manifest_version }}
       tag: ${{ steps.generate-version.outputs.git_version }}
       archive_name: ${{ steps.package-name.outputs.archive_name }}
 
@@ -70,8 +71,8 @@ jobs:
           project_version=$(sed -n \
             '/APP_VERSION_MARKER/{n; s|<Version>\(.*\)</Version>|\1|; p;}' \
             RemoteVoiceSplit/RemoteVoiceSplit.csproj | tr -d '\r' | xargs)
-          if [[ ! "${project_version}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "Project Version must be a three-part numeric version." >&2
+          if [[ ! "${project_version}" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z]+([.-][0-9A-Za-z]+)*)?$ ]]; then
+            echo "Project Version must be a three-part version with an optional SemVer prerelease label." >&2
             exit 1
           fi
           host_version=$(sed -n \
@@ -94,8 +95,9 @@ jobs:
       - name: Validate release plan
         run: |
           set -euo pipefail
-          if [[ "${{ steps.generate-version.outputs.release_mode }}" == "latest" ]]; then
+          if [[ "${{ steps.generate-version.outputs.release_mode }}" =~ ^(latest|prerelease)$ ]]; then
             grep -Fq "## [${{ steps.project-version.outputs.version }}]" CHANGELOG.md
+            grep -Fq "## v${{ steps.project-version.outputs.version }}" assets/CHANGELOG.md
           fi
 
       - name: Resolve package name
@@ -126,9 +128,15 @@ jobs:
         uses: ./.github/actions/setup-dotnet
 
       - name: Build release configuration
-        run: >-
-          dotnet build RemoteVoiceSplit.slnx --no-restore
-          --configuration Release -p:BepInExPluginVersion=0.0.0
+        run: |
+          set -euo pipefail
+          dotnet_build_args=(--no-restore --configuration Release)
+          if [[ "${{ needs.plan.outputs.release_mode }}" != "latest" ]]; then
+            # BepInEx 5 parses plugin metadata as System.Version and rejects
+            # prerelease and edge labels. Keep release identity in Version.
+            dotnet_build_args+=(-p:BepInExPluginVersion=0.0.0)
+          fi
+          dotnet build RemoteVoiceSplit.slnx "${dotnet_build_args[@]}"
 
       - name: Create artifact
         run: |
@@ -151,7 +159,7 @@ jobs:
             "${TMP_ARTIFACT_DIR}/${ARTIFACT_STEM}/"
 
           jq \
-            --arg version "${{ needs.plan.outputs.project_version }}" \
+            --arg version "${{ needs.plan.outputs.manifest_version }}" \
             '.version_number = $version' \
             ./assets/manifest.json \
             > "${TMP_ARTIFACT_DIR}/${ARTIFACT_STEM}/manifest.json"
@@ -200,6 +208,7 @@ jobs:
             echo "| Release mode | ${{ needs.plan.outputs.release_mode }} |"
             echo "| Project version | ${{ needs.plan.outputs.project_version }} |"
             echo "| Artifact version | ${{ needs.plan.outputs.artifact_version }} |"
+            echo "| Manifest version | ${{ needs.plan.outputs.manifest_version }} |"
             echo "| Artifact | [Download](${{ steps.upload-artifact.outputs.artifact-url }}) |"
             echo "| Artifact digest | \`${{ steps.upload-artifact.outputs.artifact-digest }}\` |"
           } >> "${GITHUB_STEP_SUMMARY}"
@@ -208,9 +217,9 @@ jobs:
     needs:
       - build
       - plan
-    # Keep stable publication ready without treating a version change as
-    # publication authorization.
-    if: false && needs.plan.outputs.release_mode == 'latest'
+    # Alpha and other prerelease versions are authorized for GitHub-only
+    # publication. Stable and Thunderstore publication remain disabled.
+    if: needs.plan.outputs.release_mode == 'prerelease'
     # Publication is a lightweight artifact and API operation with no native
     # compatibility contract or full-VM requirement.
     runs-on: ubuntu-slim
@@ -248,21 +257,9 @@ jobs:
           tag: ${{ needs.plan.outputs.tag }}
           commit: ${{ github.sha }}
           immutableCreate: true
-          prerelease: false
-          makeLatest: true
+          prerelease: true
+          makeLatest: false
           generateReleaseNotes: true
           artifacts: ./tmp_artifacts/*.zip
           artifactErrorsFailBuild: true
           artifactContentType: application/zip
-
-      - name: Publish stable release to Thunderstore
-        uses: ./.github/actions/publish-thunderstore
-        with:
-          artifact_path: ./tmp_artifacts/${{ needs.plan.outputs.archive_name }}
-          token: ${{ secrets.THUNDERSTORE_TOKEN }}
-          namespace: aoirint
-          community: lethal-company
-          community_categories: |
-            mods
-            tweaks-and-quality-of-life
-            ai-generated

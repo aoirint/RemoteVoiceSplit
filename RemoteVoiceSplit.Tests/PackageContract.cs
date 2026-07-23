@@ -5,6 +5,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
@@ -55,7 +56,10 @@ internal static class PackageContract
         "LICENSE",
     };
 
-    public static void Validate(string archivePath, string expectedProjectVersion, string expectedArtifactVersion)
+    public static void Validate(
+        string archivePath,
+        string expectedProjectVersion,
+        string expectedArtifactVersion)
     {
         FileInfo archiveFile = new(archivePath);
         if (!archiveFile.Exists || archiveFile.Length == 0 || archiveFile.Length > MaximumArchiveLength)
@@ -106,18 +110,34 @@ internal static class PackageContract
             }
         }
 
-        ValidatePluginAssembly(ReadEntry(archive, "RemoteVoiceSplit.dll"), expectedProjectVersion);
-        ValidateAudioHostAssembly(ReadEntry(archive, "RemoteVoiceSplit.AudioHost.exe"), expectedProjectVersion);
+        string expectedPluginVersion = ResolvePluginVersion(expectedProjectVersion);
+        string expectedManifestVersion = ResolveManifestVersion(expectedProjectVersion);
+        ValidatePluginAssembly(
+            ReadEntry(archive, "RemoteVoiceSplit.dll"),
+            expectedProjectVersion,
+            expectedPluginVersion);
+        ValidateAudioHostAssembly(
+            ReadEntry(archive, "RemoteVoiceSplit.AudioHost.exe"),
+            expectedProjectVersion);
         ValidateAudioHostConfiguration(ReadText(archive, "RemoteVoiceSplit.AudioHost.exe.config"));
         ValidateReadme(ReadText(archive, "README.md"));
         ValidateChangelog(ReadText(archive, "CHANGELOG.md"), expectedProjectVersion);
-        ValidateManifest(ReadText(archive, "manifest.json"), expectedProjectVersion);
+        ValidateManifest(ReadText(archive, "manifest.json"), expectedManifestVersion);
         ValidateIcon(ReadEntry(archive, "icon.png"));
         if (ReadEntry(archive, "LICENSE").Length == 0)
         {
             throw new InvalidDataException("Packaged LICENSE must not be empty.");
         }
     }
+
+    internal static string ResolvePluginVersion(string projectVersion) =>
+        IsPrerelease(projectVersion) ? "0.0.0" : projectVersion;
+
+    internal static string ResolveManifestVersion(string projectVersion) =>
+        IsPrerelease(projectVersion) ? "0.0.0" : projectVersion;
+
+    private static bool IsPrerelease(string version) =>
+        version.Contains('-', StringComparison.Ordinal);
 
     private static void ValidateEntry(ZipArchiveEntry entry)
     {
@@ -248,7 +268,10 @@ internal static class PackageContract
         | (bytes[offset + 2] << 8)
         | bytes[offset + 3];
 
-    private static void ValidatePluginAssembly(byte[] assemblyBytes, string expectedVersion)
+    private static void ValidatePluginAssembly(
+        byte[] assemblyBytes,
+        string expectedProjectVersion,
+        string expectedPluginVersion)
     {
         try
         {
@@ -259,7 +282,7 @@ internal static class PackageContract
                 throw new InvalidDataException("Packaged assembly name is incorrect.");
             }
 
-            string expectedAssemblyVersion = $"{expectedVersion}.0";
+            string expectedAssemblyVersion = $"{expectedProjectVersion.Split('-', 2)[0]}.0";
             if (!string.Equals(module.Assembly.Name.Version.ToString(), expectedAssemblyVersion, StringComparison.Ordinal))
             {
                 throw new InvalidDataException("Packaged assembly version is incorrect.");
@@ -268,7 +291,7 @@ internal static class PackageContract
             CustomAttribute plugin = FindSingleAttribute(module, "BepInEx.BepInPlugin");
             ValidateStringArgument(plugin, 0, "com.aoirint.remotevoicesplit", "plugin GUID");
             ValidateStringArgument(plugin, 1, "Remote Voice Split", "plugin name");
-            ValidateStringArgument(plugin, 2, expectedVersion, "plugin version");
+            ValidateStringArgument(plugin, 2, expectedPluginVersion, "plugin version");
 
             CustomAttribute process = FindSingleAttribute(module, "BepInEx.BepInProcess");
             ValidateStringArgument(process, 0, "Lethal Company.exe", "process restriction");
@@ -290,7 +313,7 @@ internal static class PackageContract
                 throw new InvalidDataException("Packaged audio host assembly name is incorrect.");
             }
 
-            string expectedAssemblyVersion = $"{expectedVersion}.0";
+            string expectedAssemblyVersion = $"{expectedVersion.Split('-', 2)[0]}.0";
             if (!string.Equals(module.Assembly.Name.Version.ToString(), expectedAssemblyVersion, StringComparison.Ordinal))
             {
                 throw new InvalidDataException("Packaged audio host assembly version is incorrect.");
@@ -361,12 +384,18 @@ internal static class PackageContractTests
         string expectedArtifactVersion,
         string? archivePath)
     {
+        string expectedManifestVersion =
+            PackageContract.ResolveManifestVersion(expectedVersion);
         string tempRoot = Path.Combine(Path.GetTempPath(), $"remote-voice-split-package-tests-{Guid.NewGuid():N}");
         Directory.CreateDirectory(tempRoot);
         try
         {
             PackageFixtureBuilder.ArchiveSource[] validSources =
-                CreateValidSources(assemblyPath, audioHostPath, repositoryRoot);
+                CreateValidSources(
+                    assemblyPath,
+                    audioHostPath,
+                    repositoryRoot,
+                    expectedManifestVersion);
             AssertAccepted("valid", validSources, tempRoot, expectedVersion);
 
             AssertRejected("missing-file", validSources.Where(source => source.Name != "README.md"), tempRoot, expectedVersion, "exactly eight files");
@@ -439,7 +468,10 @@ internal static class PackageContractTests
 
             AssertRejected(
                 "manifest-name",
-                Replace(validSources, "manifest.json", new("manifest.json", ManifestBytes(expectedVersion, "WrongName"))),
+                Replace(
+                    validSources,
+                    "manifest.json",
+                    new("manifest.json", ManifestBytes(expectedManifestVersion, "WrongName"))),
                 tempRoot,
                 expectedVersion,
                 "manifest name is incorrect");
@@ -454,7 +486,12 @@ internal static class PackageContractTests
                 Replace(
                     validSources,
                     "manifest.json",
-                    new("manifest.json", ManifestBytes(expectedVersion, "RemoteVoiceSplit", "Wrong-Dependency-1.0.0"))),
+                    new(
+                        "manifest.json",
+                        ManifestBytes(
+                            expectedManifestVersion,
+                            "RemoteVoiceSplit",
+                            "Wrong-Dependency-1.0.0"))),
                 tempRoot,
                 expectedVersion,
                 "manifest dependencies are incorrect");
@@ -466,7 +503,10 @@ internal static class PackageContractTests
                 "manifest is not valid JSON");
             AssertRejected(
                 "manifest-misleading-field",
-                Replace(validSources, "manifest.json", new("manifest.json", MisleadingManifestBytes(expectedVersion))),
+                Replace(
+                    validSources,
+                    "manifest.json",
+                    new("manifest.json", MisleadingManifestBytes(expectedManifestVersion))),
                 tempRoot,
                 expectedVersion,
                 "manifest name is incorrect");
@@ -476,7 +516,10 @@ internal static class PackageContractTests
             AssertRejectedArchiveSize(tempRoot, expectedVersion);
             if (archivePath is not null)
             {
-                PackageContract.Validate(archivePath, expectedVersion, expectedArtifactVersion);
+                PackageContract.Validate(
+                    archivePath,
+                    expectedVersion,
+                    expectedArtifactVersion);
             }
 
             Console.WriteLine("All package contract tests passed.");
@@ -490,7 +533,8 @@ internal static class PackageContractTests
     private static PackageFixtureBuilder.ArchiveSource[] CreateValidSources(
         string assemblyPath,
         string audioHostPath,
-        string repositoryRoot) => new[]
+        string repositoryRoot,
+        string expectedManifestVersion) => new[]
     {
         PackageFixtureBuilder.ArchiveSource.FromFile("RemoteVoiceSplit.dll", assemblyPath),
         PackageFixtureBuilder.ArchiveSource.FromFile("RemoteVoiceSplit.AudioHost.exe", audioHostPath),
@@ -499,10 +543,26 @@ internal static class PackageContractTests
             audioHostPath + ".config"),
         PackageFixtureBuilder.ArchiveSource.FromFile("README.md", Path.Combine(repositoryRoot, "assets", "README.md")),
         PackageFixtureBuilder.ArchiveSource.FromFile("CHANGELOG.md", Path.Combine(repositoryRoot, "assets", "CHANGELOG.md")),
-        PackageFixtureBuilder.ArchiveSource.FromFile("manifest.json", Path.Combine(repositoryRoot, "assets", "manifest.json")),
+        ManifestFromFile(
+            Path.Combine(repositoryRoot, "assets", "manifest.json"),
+            expectedManifestVersion),
         PackageFixtureBuilder.ArchiveSource.FromFile("icon.png", Path.Combine(repositoryRoot, "assets", "icon.png")),
         PackageFixtureBuilder.ArchiveSource.FromFile("LICENSE", Path.Combine(repositoryRoot, "LICENSE")),
     };
+
+    private static PackageFixtureBuilder.ArchiveSource ManifestFromFile(
+        string path,
+        string version)
+    {
+        // CI rewrites only version_number during staging; mirror that
+        // production transformation while preserving the repository asset.
+        JsonObject manifest = JsonNode.Parse(File.ReadAllBytes(path))?.AsObject()
+            ?? throw new InvalidDataException("Source manifest must be a JSON object.");
+        manifest["version_number"] = version;
+        return new(
+            "manifest.json",
+            Encoding.UTF8.GetBytes(manifest.ToJsonString()));
+    }
 
     private static void AssertAccepted(
         string name,

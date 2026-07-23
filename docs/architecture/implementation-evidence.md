@@ -41,8 +41,8 @@ process, tests, package contents, and user instructions are target-specific.
 | Game API, patch timing, and mod set | Confirmed statically and by deterministic branch tests; audible runtime pending | Postfix `StartOfRound.RefreshPlayerVoicePlaybackObjects()` after v81 assigns remote `AudioSource` objects. Host/client, death, spectating, and walkie-talkie scenarios exercise the production selection policy. Clean BepInEx plus this mod is the supported validation set; Unity filter ordering and third-party patch interaction remain unverified. |
 | OBS process capture | Confirmed statically; runtime pending | Windows captures a selected process and descendants. The audio host must be outside the game process tree; see [OBS process audio capture](../domain/obs-process-audio-capture.md). |
 | Package host | Confirmed | Thunderstore Lethal Company package using the repository-family archive layout. |
-| Release mode | Confirmed | Project version `0.0.0` is edge-only. Stable release and all publication remain disabled. |
-| GitHub Actions and Releases | Confirmed for edge builds | The public repository enforces protected-branch checks and pinned Actions. Workflows build and retain validated edge artifacts; release publication remains inert at version `0.0.0`. |
+| Release mode | Confirmed | Project version `0.1.0-alpha.1` publishes an immutable GitHub prerelease. Stable GitHub and Thunderstore publication remain disabled. |
+| GitHub Actions and Releases | Confirmed for edge builds; prerelease pending | The public repository enforces protected-branch checks and pinned Actions. Workflows retain validated artifacts and publish SemVer prereleases only after integrated lint, test, plan, build, archive, and checksum gates pass. |
 | Thunderstore | Yes; publication blocked | Package assets and inert publisher tooling are retained. Namespace authorization, runtime evidence, and publication authorization are blocked. |
 | APM | Yes | The pinned family Skill set is retained. Project metadata changes without changing dependency pins. |
 
@@ -99,9 +99,9 @@ application-quit cleanup call path.
   crashes have not been observed.
 - Publication credentials and namespace authorization are not configured.
 
-These blockers prevent a compatibility approval, stable version, GitHub
-Release, or Thunderstore upload. They do not block deterministic implementation
-and package validation.
+These blockers prevent a compatibility approval, stable GitHub Release, or
+Thunderstore upload. They do not block a clearly labeled GitHub alpha,
+deterministic implementation, or package validation.
 
 ## Completed static verification
 
