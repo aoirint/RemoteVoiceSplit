@@ -25,7 +25,6 @@
 - This will be the first public Thunderstore release and is a beta. Complete
   multiplayer voice-path, recording-track, endpoint-recovery, host-termination,
   and live-configuration coverage remains required before stable approval.
-- Compatibility: Lethal Company v81.
-    - Steam Build ID: `22825947`
+- Compatibility: Lethal Company v81 (2026-04-17 UTC).
     - Steam Manifest ID: `6423525044216269478`
 - Install the mod only on clients that want separate remote-voice recording.
