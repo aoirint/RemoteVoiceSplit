@@ -14,7 +14,7 @@ incorrect audio routing may occur.**
   audio.
 - Exposes the companion process as an application audio source without
   requiring a virtual audio device.
-- Keeps the local microphone and game audio in `Lethal Company.exe`.
+- Sends only remote-player voice playback to the companion process.
 - Mutes remote voice by default when separate output is unavailable, preventing
   it from entering the game-audio track.
 - Recovers the companion process and audio endpoint while the game remains

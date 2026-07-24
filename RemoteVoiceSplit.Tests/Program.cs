@@ -476,7 +476,7 @@ internal static class Program
                 isPlayerControlled: true,
                 isPlayerDead: false,
                 hasVoiceSource: true),
-            "The living local player's microphone playback source was routed.");
+            "The living local player's voice playback source was routed.");
         Assert(
             !RemoteVoiceSelectionPolicy.ShouldCapture(
                 isLocalPlayer: true,
