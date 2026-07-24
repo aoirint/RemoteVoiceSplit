@@ -1,42 +1,42 @@
 # Remote Voice Split
 
 Remote Voice Split is a client-side BepInEx 5 Mono mod for Lethal Company on
-Windows. It separates other players' voices from the rest of the game audio,
-so each can be recorded on a different track. A small companion process
-named `RemoteVoiceSplit.AudioHost.exe` provides the separate audio source.
+Windows. It sends other players' voices to a companion audio process so remote
+voice and the rest of the game can be recorded on different tracks.
 
-Music, sound effects, and the local microphone remain in the normal Lethal
-Company process. When the audio host cannot be started or connected safely,
-remote voices are silent by default so they do not leak into the game-audio
-recording track. An opt-out setting can keep them on the normal game output
-instead.
+**This project is currently in public beta. Real-world testing remains limited,
+and issues such as reduced game-audio quality, latency, missing audio, or
+incorrect audio routing may occur.**
 
-## Beta status
+## Features
 
-The first Thunderstore release is planned as a public beta. The implementation
-and build-time verification are complete, but the full supported-build runtime
-matrix is not. Expect audio-routing or recovery issues that have not appeared
-in deterministic tests, and include the mod version, game build, configuration,
-and relevant BepInEx log entries when reporting them.
+- Separates remote player voices from music, sound effects, and other game
+  audio.
+- Exposes the companion process as an application audio source without
+  requiring a virtual audio device.
+- Keeps the local microphone and game audio in `Lethal Company.exe`.
+- Mutes remote voice by default when separate output is unavailable, preventing
+  it from entering the game-audio track.
+- Recovers the companion process and audio endpoint while the game remains
+  open.
 
-Thunderstore package versions use three numeric parts without a prerelease
-suffix. A numeric package version therefore identifies the beta artifact; it
-does not mean that the project has completed stable-release validation.
+## Compatibility
 
-## Requirements
+- Lethal Company v81
+    - Steam Build ID: `22825947`
+    - Steam Manifest ID: `6423525044216269478`
+- BepInEx 5 through BepInExPack 5.4.2305
+- Windows with .NET Framework 4.8
+- OBS Studio Application Audio Capture
 
-- Lethal Company v81 on Windows:
-  Steam Build ID `22825947`, Manifest ID `6423525044216269478`.
-- BepInEx 5.x Mono.
-- OBS Studio with Application Audio Capture support.
-- .NET Framework 4.8, which is included with supported Windows releases.
+Only clients that want separate remote-voice recording need this mod. The
+lobby host and other players do not need to install it. Other Lethal Company
+versions are not currently supported.
 
-This mod is client-side. Other players and the lobby host do not need it.
-Other game versions are not currently supported.
+## Installation
 
-## Install
-
-Copy these files from the package into the same plugin directory:
+Install a release package through a compatible mod manager, or copy these files
+from the package into the same plugin directory:
 
 ```text
 Lethal Company/BepInEx/plugins/RemoteVoiceSplit/RemoteVoiceSplit.dll
@@ -47,32 +47,7 @@ Lethal Company/BepInEx/plugins/RemoteVoiceSplit/RemoteVoiceSplit.AudioHost.exe.c
 Do not rename or separate these files. Do not copy build-time BepInEx,
 Harmony, Unity, game, or .NET reference assemblies.
 
-## Configure
-
-BepInEx creates
-`BepInEx/config/com.aoirint.remotevoicesplit.cfg` after the first launch.
-The default is:
-
-```ini
-[General]
-Enabled = true
-FallbackToGameOutput = false
-```
-
-Set `Enabled` to `false` to disable voice separation and keep remote voices on
-the normal game output. Keep `FallbackToGameOutput` at `false` for strict
-recording-track separation while the mod is enabled. Remote voices are
-inaudible whenever separate process output cannot accept them. Set it to
-`true` to fall back to `Lethal Company.exe` during those failures, accepting
-that remote voices can appear in the game-audio track.
-
-Changes made through a BepInEx configuration UI apply immediately to the next
-voice block. Disabling the mod does not unload its process-lifetime integration;
-it keeps the routing infrastructure available so `Enabled` can be turned back
-on without restarting the game. The mod does not watch external edits to the
-generated configuration file.
-
-## Configure OBS Studio
+## OBS setup
 
 1. Start Lethal Company and wait for the audio-host window to appear.
 2. In OBS, add an **Application Audio Capture (BETA)** source.
@@ -87,9 +62,44 @@ the current Windows multimedia default output, so players still hear remote
 voice normally. Its OBS-selectable window remains available across temporary
 audio-device or connection recovery while Lethal Company keeps running.
 
-## Build
+## Configuration
+
+BepInEx creates
+`BepInEx/config/com.aoirint.remotevoicesplit.cfg` after the first launch.
+
+| Setting | Default | Behavior |
+| --- | --- | --- |
+| `General.Enabled` | `true` | Separates remote voice. Set it to `false` to keep remote voice on the normal game output. |
+| `General.FallbackToGameOutput` | `false` | Keeps remote voice silent when separate output is unavailable. Set it to `true` to use the normal game output during those failures. |
+
+Either setting can place remote voice in the game-audio track. Changes made
+through a BepInEx configuration UI apply to the next voice block. Disabling
+the mod keeps its process-lifetime routing infrastructure available, so it can
+be enabled again without restarting the game. The mod does not watch direct
+edits to the generated configuration file.
+
+## Troubleshooting
+
+- **The audio-host window does not appear:** keep all three installed files
+  together and inspect `BepInEx/LogOutput.log` for
+  `com.aoirint.remotevoicesplit`. Remote voice is silent with the default
+  fallback setting until the host is available.
+- **OBS shows the window but receives no voice:** join a lobby with another
+  player, confirm that the source targets `RemoteVoiceSplit.AudioHost.exe`, and
+  check that the source is not muted.
+- **Remote voice remains in the game source:** confirm that
+  `General.Enabled` is `true` and `General.FallbackToGameOutput` is `false`.
+- **Remote voice is duplicated:** avoid capturing global Desktop Audio
+  alongside both application sources, and remove other voice-routing mods
+  while testing.
+
+Include the package version, Lethal Company build, configuration, and relevant
+log entries when [reporting a problem](CONTRIBUTING.md#reporting-issues).
+
+## Development
 
 The repository pins .NET SDK 10.0.201 and all NuGet versions.
+The build does not require a local Lethal Company installation.
 
 ```powershell
 dotnet restore RemoteVoiceSplit.slnx --locked-mode
@@ -98,36 +108,32 @@ dotnet build RemoteVoiceSplit.slnx --no-restore -c Release -p:BepInExPluginVersi
 dotnet run --project RemoteVoiceSplit.Tests --no-build -c Release -- RemoteVoiceSplit/bin/Release/netstandard2.1/RemoteVoiceSplit.dll RemoteVoiceSplit.AudioHost/bin/Release/net48/RemoteVoiceSplit.AudioHost.exe 0.1.0-alpha.4 0.1.0-alpha.4
 ```
 
-Add `--live-audio` to the test command on a Windows machine with an active
-default render endpoint to exercise same-PID reconnection, forced termination,
-default-endpoint failure, and recovery. Use
-`--live-audio-soak-seconds 60` instead to include a sixty-second connected
-host-lifetime check.
+For Debug builds, live-audio checks, dependency review, Markdown lint, and
+runtime installation, see
+[development operations](docs/operations/development.md).
 
-CI owns creation of the validated Thunderstore-compatible ZIP. Version `0.0.0`
-always produces an edge artifact, and SemVer prereleases publish only to
-GitHub. The current workflow does not yet publish a numeric beta to GitHub or
-Thunderstore; enabling that path is a separate reviewed change. See
-[release operations](docs/operations/release.md).
+## Release status
 
-## Troubleshooting
+CI owns creation of the validated Thunderstore-compatible ZIP. Pushes to
+`main` produce edge artifacts, and SemVer prereleases publish only to GitHub.
+Thunderstore public-beta publication remains a separate reviewed workflow
+change.
 
-- No `Lethal Company Remote Voice Split` window: remote voices are silent with
-  the default fallback setting. Confirm that both packaged files remain
-  together and inspect `BepInEx/LogOutput.log` for
-  `com.aoirint.remotevoicesplit`.
-- OBS shows the window but receives no voice: join a lobby with another player,
-  verify that OBS targets `RemoteVoiceSplit.AudioHost.exe`, and check that the
-  source is not muted.
-- Remote voice remains in the game source: confirm that
-  `General.Enabled` is `true` and `General.FallbackToGameOutput` is `false`.
-  With the mod disabled or fallback enabled, Unity deliberately keeps the
-  applicable remote-voice blocks. The first warning in the BepInEx log
-  identifies an unavailable-host transition.
-- Duplicate remote voice: do not capture global Desktop Audio alongside both
-  application sources, and remove other voice-routing mods while testing.
+See [release operations](docs/operations/release.md) for archive validation,
+runtime gates, publication steps, and recovery.
 
-Developer documentation starts at [docs/README.md](docs/README.md).
+## Documentation
+
+- [Developer documentation](docs/README.md)
+- [Audio-routing architecture](docs/architecture/audio-routing.md)
+- [Development operations](docs/operations/development.md)
+- [Release operations](docs/operations/release.md)
+
+## Contributing
+
+Bug reports, compatibility notes, documentation improvements, and focused code
+changes are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening an
+issue or pull request.
 
 ## License
 
