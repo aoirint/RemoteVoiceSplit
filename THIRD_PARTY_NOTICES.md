@@ -9,16 +9,16 @@ upstream license and notices continue to apply.
 - Source: [aoirint/skills](https://github.com/aoirint/skills), selected Skill
   directories under `.apm/skills/`
 - Pinned commit:
-  [`6a0e8787fa1e91c21909247f05e7499ebcfecfe1`](https://github.com/aoirint/skills/tree/6a0e8787fa1e91c21909247f05e7499ebcfecfe1)
+  [`0833b2bb63479927238250abd6aa7774b836ff25`](https://github.com/aoirint/skills/tree/0833b2bb63479927238250abd6aa7774b836ff25)
 - Deployed paths: selected directories under `.agents/skills/`, as recorded in
   `apm.lock.yaml`
 - License: MIT; see the
-  [upstream license](https://github.com/aoirint/skills/blob/6a0e8787fa1e91c21909247f05e7499ebcfecfe1/LICENSE)
+  [upstream license](https://github.com/aoirint/skills/blob/0833b2bb63479927238250abd6aa7774b836ff25/LICENSE)
 - Copyright: Copyright (c) 2026 aoirint
 - Notice: the selected Skill directories contain no additional copyright or
   NOTICE files.
 - Cooldown: the maintainer waived the waiting period only for direct
   `aoirint/skills` commit
-  `6a0e8787fa1e91c21909247f05e7499ebcfecfe1` while requesting the
-  RemoteVoiceSplit Skill update. Dependencies remain subject to normal review
-  and cooldown requirements.
+  `0833b2bb63479927238250abd6aa7774b836ff25` while requesting the
+  PowerShell verification Skill rollout. Dependencies remain subject to normal
+  review and cooldown requirements.
