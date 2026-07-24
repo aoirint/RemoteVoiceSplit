@@ -1,10 +1,9 @@
 # Remote Voice Split
 
 Remote Voice Split is a client-side BepInEx 5 Mono mod for Lethal Company on
-Windows. It plays voices from other players through a small companion process
-named `RemoteVoiceSplit.AudioHost.exe`. OBS Studio can capture that process as
-an Application Audio Capture source, so remote voice and the rest of the game
-can be assigned to different recording tracks.
+Windows. It separates other players' voices from the rest of the game audio,
+so each can be recorded on a different track. A small companion process
+named `RemoteVoiceSplit.AudioHost.exe` provides the separate audio source.
 
 Music, sound effects, and the local microphone remain in the normal Lethal
 Company process. When the audio host cannot be started or connected safely,
@@ -12,9 +11,17 @@ remote voices are silent by default so they do not leak into the game-audio
 recording track. An opt-out setting can keep them on the normal game output
 instead.
 
-The implementation and build-time verification are complete. A two-player
-runtime validation on the supported build is still required before a stable
-release.
+## Beta status
+
+The first Thunderstore release is planned as a public beta. The implementation
+and build-time verification are complete, but the full supported-build runtime
+matrix is not. Expect audio-routing or recovery issues that have not appeared
+in deterministic tests, and include the mod version, game build, configuration,
+and relevant BepInEx log entries when reporting them.
+
+Thunderstore package versions use three numeric parts without a prerelease
+suffix. A numeric package version therefore identifies the beta artifact; it
+does not mean that the project has completed stable-release validation.
 
 ## Requirements
 
@@ -98,8 +105,9 @@ default-endpoint failure, and recovery. Use
 host-lifetime check.
 
 CI owns creation of the validated Thunderstore-compatible ZIP. Version `0.0.0`
-always produces an edge artifact. SemVer prereleases publish only to GitHub;
-stable GitHub and Thunderstore publication remain disabled. See
+always produces an edge artifact, and SemVer prereleases publish only to
+GitHub. The current workflow does not yet publish a numeric beta to GitHub or
+Thunderstore; enabling that path is a separate reviewed change. See
 [release operations](docs/operations/release.md).
 
 ## Troubleshooting

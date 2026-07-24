@@ -191,10 +191,21 @@ internal static class PackageContract
     private static void ValidateChangelog(string changelog, string version)
     {
         bool isDevelopmentVersion = string.Equals(version, "0.0.0", StringComparison.Ordinal);
-        string requiredHeading = isDevelopmentVersion ? "## Unreleased" : $"## v{version}";
+        bool isPrereleaseVersion = version.Contains('-');
+        string requiredHeading = isDevelopmentVersion || isPrereleaseVersion
+            ? "## Unreleased"
+            : $"## v{version}";
         if (isDevelopmentVersion && changelog.Contains("## v0.0.0", StringComparison.Ordinal))
         {
             throw new InvalidDataException("Packaged changelog must not present v0.0.0 as a release version.");
+        }
+
+        if (Regex.IsMatch(
+            changelog,
+            "^## v[0-9]+\\.[0-9]+\\.[0-9]+-[0-9A-Za-z]",
+            RegexOptions.CultureInvariant | RegexOptions.Multiline))
+        {
+            throw new InvalidDataException("Packaged changelog must not include prerelease release headings.");
         }
 
         if (!changelog.Contains(requiredHeading, StringComparison.Ordinal))
@@ -464,6 +475,22 @@ internal static class PackageContractTests
                     tempRoot,
                     expectedVersion,
                     "must not present v0.0.0 as a release version");
+            }
+
+            if (expectedVersion.Contains('-'))
+            {
+                AssertRejected(
+                    "prerelease-changelog-version",
+                    Replace(
+                        validSources,
+                        "CHANGELOG.md",
+                        new(
+                            "CHANGELOG.md",
+                            Encoding.UTF8.GetBytes(
+                                $"# Changelog\n\n## Unreleased\n\n## v{expectedVersion} - 2026-07-23\n"))),
+                    tempRoot,
+                    expectedVersion,
+                    "must not include prerelease release headings");
             }
 
             AssertRejected(

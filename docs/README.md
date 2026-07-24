@@ -43,7 +43,9 @@ and repeatable maintainer procedures.
 ## Operations
 
 - [Development](operations/development.md) defines restore, format, build, test, metadata, and dependency checks.
-- [Release](operations/release.md) defines packaging, archive validation, CI, GitHub Release, and recovery procedures.
+- [Release](operations/release.md) defines packaging, archive validation,
+  public-beta and stable publication gates, CI, GitHub Release, and recovery
+  procedures.
 - [Icon authoring](icon-authoring.md) defines the editable package-icon source,
   rendering, and verification contract.
 
