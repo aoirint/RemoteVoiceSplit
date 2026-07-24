@@ -41,9 +41,9 @@ process, tests, package contents, and user instructions are target-specific.
 | Game API, patch timing, and mod set | Confirmed statically and by deterministic branch tests; audible runtime pending | Postfix `StartOfRound.RefreshPlayerVoicePlaybackObjects()` after v81 assigns remote `AudioSource` objects. Host/client, death, spectating, and walkie-talkie scenarios exercise the production selection policy. Clean BepInEx plus this mod is the supported validation set; Unity filter ordering and third-party patch interaction remain unverified. |
 | OBS process capture | Confirmed statically; runtime pending | Windows captures a selected process and descendants. The audio host must be outside the game process tree; see [OBS process audio capture](../domain/obs-process-audio-capture.md). |
 | Package host | Confirmed | Thunderstore Lethal Company package using the repository-family archive layout. |
-| Release mode | Confirmed | The project version publishes an immutable GitHub prerelease and the same verified ZIP to Thunderstore as a clearly labeled public beta. Stable approval remains disabled. |
-| GitHub Actions and Releases | Configured for public beta | The public repository enforces protected-branch checks and pinned Actions. Workflows retain validated artifacts and publish the selected beta only after integrated lint, test, plan, build, archive, and checksum gates pass. |
-| Thunderstore | Yes; beta publication authorized | The `THUNDERSTORE_TOKEN` is configured and its value was not inspected. The selected public-beta workflow uses the `aoirint` namespace, the Lethal Company community, and its declared categories. |
+| Release mode | Confirmed | Every non-edge project version publishes an immutable GitHub prerelease. Numeric public-beta packages also publish the same verified ZIP to Thunderstore. Stable approval remains disabled. |
+| GitHub Actions and Releases | Configured for public beta | The public repository enforces protected-branch checks and pinned Actions. Workflows retain validated artifacts and publish only after integrated lint, test, plan, build, archive, and checksum gates pass. |
+| Thunderstore | Yes; numeric beta publication authorized | The `THUNDERSTORE_TOKEN` is configured and its value was not inspected. The workflow uses the `aoirint` namespace, the Lethal Company community, and its declared categories. |
 | APM | Yes | The pinned family Skill set is retained. Project metadata changes without changing dependency pins. |
 
 ## Selected design

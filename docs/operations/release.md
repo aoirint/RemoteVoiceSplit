@@ -8,9 +8,10 @@ numeric release is a clearly labeled public beta and publishes to
 Thunderstore. Stable-release approval remains disabled until the complete
 runtime matrix passes.
 
-The Main workflow creates a validated package artifact, an immutable GitHub
-prerelease, and a Thunderstore package for the selected public beta. The
-BepInEx metadata and Thunderstore manifest use the numeric project version.
+The Main workflow creates a validated package artifact and immutable GitHub
+prerelease for every non-edge version. Numeric public-beta packages also
+publish to Thunderstore. BepInEx metadata and the Thunderstore manifest use
+the numeric project version.
 
 The maintainer has confirmed that the `THUNDERSTORE_TOKEN` repository secret is
 configured. Its value must never be copied into documentation, logs, workflow
@@ -71,14 +72,13 @@ workflow and verify `SHA256SUMS` before extraction.
 
 ## Public beta publication
 
-The selected beta uses a nonzero three-part numeric package version
+Numeric public beta packages use a nonzero three-part package version
 because Thunderstore does not accept prerelease suffixes. The numeric version
 is an artifact identity, not a stable-quality claim. The package beta notice
 defines the user-facing quality and validation scope.
 
 The Main workflow creates a GitHub prerelease, then submits the same verified
-ZIP to Thunderstore. It is limited to the selected version; any later numeric version needs a
-separate workflow review.
+ZIP to Thunderstore.
 
 Do not rewrite a prerelease artifact as a numeric version after the build. The
 project versions, generated manifest, changelog entries, binary metadata,
