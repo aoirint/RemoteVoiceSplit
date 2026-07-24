@@ -25,7 +25,13 @@
 - This will be the first public Thunderstore release and is a beta. Complete
   multiplayer voice-path, recording-track, endpoint-recovery, host-termination,
   and live-configuration coverage remains required before stable approval.
-- Compatibility: Lethal Company v81.
-    - Steam Build ID: `22825947`
-    - Steam Manifest ID: `6423525044216269478`
+- Compatibility
+    - Lethal Company v81 (2026-04-17 UTC)
+        - Steam Manifest ID: `6423525044216269478`
+        - Test environment
+            - [BepInExPack][bepinexpack-package] v5.4.2305 (2026-03-17 UTC)
+    - Windows with .NET Framework 4.8
+    - OBS Studio Application Audio Capture
 - Install the mod only on clients that want separate remote-voice recording.
+
+[bepinexpack-package]: https://thunderstore.io/c/lethal-company/p/BepInEx/BepInExPack/

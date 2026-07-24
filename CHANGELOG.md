@@ -33,8 +33,13 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
   runtime-validation scope. Complete two-player OBS track separation,
   host/client and voice-path coverage, endpoint recovery, host termination,
   and live configuration switching remain required before a stable release.
-- Compatibility: Lethal Company v81, Steam Build `22825947`, Steam Manifest
-  `6423525044216269478`, Windows, and BepInEx 5.
+- Compatibility
+    - Lethal Company v81 (2026-04-17 UTC)
+        - Steam Manifest ID: `6423525044216269478`
+        - Test environment
+            - [BepInExPack][bepinexpack-package] v5.4.2305 (2026-03-17 UTC)
+    - Windows with .NET Framework 4.8
+    - OBS Studio Application Audio Capture
 
 ## [0.1.0-alpha.3] - 2026-07-23
 
@@ -59,8 +64,13 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - Upgrading from alpha.2 does not migrate
   `Audio.FallbackToGameOutput`; configure
   `General.FallbackToGameOutput` instead.
-- Compatibility: Lethal Company v81, Steam Build `22825947`, Steam Manifest
-  `6423525044216269478`, Windows, and BepInEx 5.
+- Compatibility
+    - Lethal Company v81 (2026-04-17 UTC)
+        - Steam Manifest ID: `6423525044216269478`
+        - Test environment
+            - [BepInExPack][bepinexpack-package] v5.4.2305 (2026-03-17 UTC)
+    - Windows with .NET Framework 4.8
+    - OBS Studio Application Audio Capture
 
 ## [0.1.0-alpha.2] - 2026-07-23
 
@@ -82,8 +92,13 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
   two-player OBS track separation, host/client and voice-path coverage,
   endpoint recovery, host termination, and live configuration switching remain
   required before a stable release.
-- Compatibility: Lethal Company v81, Steam Build `22825947`, Steam Manifest
-  `6423525044216269478`, Windows, and BepInEx 5.
+- Compatibility
+    - Lethal Company v81 (2026-04-17 UTC)
+        - Steam Manifest ID: `6423525044216269478`
+        - Test environment
+            - [BepInExPack][bepinexpack-package] v5.4.2305 (2026-03-17 UTC)
+    - Windows with .NET Framework 4.8
+    - OBS Studio Application Audio Capture
 
 ## [0.1.0-alpha.1] - 2026-07-23
 
@@ -149,3 +164,4 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 [0.1.0-alpha.3]: https://github.com/aoirint/RemoteVoiceSplit/releases/tag/v0.1.0-alpha.3
 [0.1.0-alpha.2]: https://github.com/aoirint/RemoteVoiceSplit/releases/tag/v0.1.0-alpha.2
 [0.1.0-alpha.1]: https://github.com/aoirint/RemoteVoiceSplit/releases/tag/v0.1.0-alpha.1
+[bepinexpack-package]: https://thunderstore.io/c/lethal-company/p/BepInEx/BepInExPack/
