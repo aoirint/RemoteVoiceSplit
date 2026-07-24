@@ -22,8 +22,9 @@
 
 ### Notes
 
-- This is the first public Thunderstore release and is a beta. See the package
-  beta notice for its current quality and validation scope.
+- This is the first public Thunderstore release and is a beta. Complete
+  multiplayer voice-path, recording-track, endpoint-recovery, host-termination,
+  and live-configuration coverage remains required before stable approval.
 - Compatibility
     - Lethal Company v81 (2026-04-17 UTC)
         - Steam Manifest ID: `6423525044216269478`
