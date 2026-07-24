@@ -20,6 +20,8 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - Updated the APM-managed `release-note-workflow` so destination-specific
   histories retain SemVer prereleases where published without presenting
   another destination's headings as public history.
+- Removed the Steam Build ID from compatibility labels while retaining the
+  Lethal Company v81 release date and Steam Manifest ID.
 
 ## [0.1.0-alpha.4] - 2026-07-23
 

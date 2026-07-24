@@ -20,6 +20,11 @@
 - Silences remote voice by default if the companion process cannot accept it,
   preventing it from entering the game-audio recording track.
 
+### Changed
+
+- Removed the Steam Build ID from compatibility labels while retaining the
+  Lethal Company v81 release date and Steam Manifest ID.
+
 ### Notes
 
 - This will be the first public Thunderstore release and is a beta. Complete
