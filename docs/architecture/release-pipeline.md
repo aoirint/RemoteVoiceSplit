@@ -12,7 +12,7 @@ metadata, the artifact name, and the Git tag derive from those project values.
 
 - `0.0.0` is always an edge build. Its artifact identity adds `edge`, UTC
   timestamp, and a short commit SHA; loader metadata remains `0.0.0`.
-- A SemVer prerelease such as `0.1.0-alpha.4` creates a GitHub prerelease. Its
+- A SemVer prerelease creates a GitHub prerelease. Its
   assembly versions use the numeric core, while BepInEx metadata and the
   Thunderstore manifest remain `0.0.0` because neither consumer accepts the
   prerelease identity. Its package-facing changelog remains an `Unreleased`
@@ -38,11 +38,11 @@ configuration, and five package assets, creates one ZIP, writes
 job downloads that exact artifact and never rebuilds it.
 
 For a prerelease, the pinned release action creates an immutable GitHub
-prerelease for the integrated commit and attaches only the validated ZIP.
-The current workflow stops there. A future reviewed beta-publication change
-may authorize one selected numeric version, keep its GitHub Release marked as
-a prerelease, and submit the same verified ZIP to Thunderstore. Stable
-publication remains separately gated by the complete runtime matrix.
+prerelease for the integrated commit and attaches only the validated ZIP. The
+selected numeric public beta follows the same GitHub-prerelease path,
+then submits that exact verified ZIP to Thunderstore. Later numeric versions
+remain blocked until separately reviewed. Stable publication remains separately
+gated by the complete runtime matrix.
 
 ## Failure boundaries
 
@@ -51,5 +51,6 @@ packaging, assembly inspection, archive validation, or checksum failure blocks
 artifact upload and publication. Edge builds skip publication.
 
 An existing release for the same tag fails instead of replacing assets. Edge
-and numeric builds currently skip publication. Recovery is documented in
+builds skip publication, and only the selected numeric beta can publish
+without another workflow review. Recovery is documented in
 [release operations](../operations/release.md).

@@ -105,7 +105,8 @@ The build does not require a local Lethal Company installation.
 dotnet restore RemoteVoiceSplit.slnx --locked-mode
 dotnet format RemoteVoiceSplit.slnx --no-restore --verify-no-changes
 dotnet build RemoteVoiceSplit.slnx --no-restore -c Release -p:BepInExPluginVersion=0.0.0
-dotnet run --project RemoteVoiceSplit.Tests --no-build -c Release -- RemoteVoiceSplit/bin/Release/netstandard2.1/RemoteVoiceSplit.dll RemoteVoiceSplit.AudioHost/bin/Release/net48/RemoteVoiceSplit.AudioHost.exe 0.1.0-alpha.4 0.1.0-alpha.4
+$projectVersion = ([xml](Get-Content -Raw RemoteVoiceSplit/RemoteVoiceSplit.csproj)).Project.PropertyGroup.Version | Select-Object -First 1
+dotnet run --project RemoteVoiceSplit.Tests --no-build -c Release -- RemoteVoiceSplit/bin/Release/netstandard2.1/RemoteVoiceSplit.dll RemoteVoiceSplit.AudioHost/bin/Release/net48/RemoteVoiceSplit.AudioHost.exe $projectVersion $projectVersion
 ```
 
 For Debug builds, live-audio checks, dependency review, Markdown lint, and
@@ -115,9 +116,9 @@ runtime installation, see
 ## Release status
 
 CI owns creation of the validated Thunderstore-compatible ZIP. Pushes to
-`main` produce edge artifacts, and SemVer prereleases publish only to GitHub.
-Thunderstore public-beta publication remains a separate reviewed workflow
-change.
+`main` produce edge artifacts, SemVer prereleases publish only to GitHub, and
+the selected numeric public beta publishes the same verified ZIP to GitHub and
+Thunderstore.
 
 See [release operations](docs/operations/release.md) for archive validation,
 runtime gates, publication steps, and recovery.
