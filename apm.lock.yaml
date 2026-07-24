@@ -1,12 +1,12 @@
 lockfile_version: '1'
-generated_at: '2026-07-24T12:27:06.275956+00:00'
+generated_at: '2026-07-24T13:38:37.028040+00:00'
 apm_version: 0.25.0
 dependencies:
 - repo_url: aoirint/skills
   name: skills
   host: github.com
-  resolved_commit: 0833b2bb63479927238250abd6aa7774b836ff25
-  resolved_ref: 0833b2bb63479927238250abd6aa7774b836ff25
+  resolved_commit: 8a6fe2398c32d2a2bf73efbbb618e443f4675ef1
+  resolved_ref: 8a6fe2398c32d2a2bf73efbbb618e443f4675ef1
   version: unknown
   virtual_path: .apm/skills/apm-usage
   is_virtual: true
@@ -34,8 +34,8 @@ dependencies:
 - repo_url: aoirint/skills
   name: skills
   host: github.com
-  resolved_commit: 0833b2bb63479927238250abd6aa7774b836ff25
-  resolved_ref: 0833b2bb63479927238250abd6aa7774b836ff25
+  resolved_commit: 8a6fe2398c32d2a2bf73efbbb618e443f4675ef1
+  resolved_ref: 8a6fe2398c32d2a2bf73efbbb618e443f4675ef1
   version: unknown
   virtual_path: .apm/skills/bepinex-mono-mod-quality-check
   is_virtual: true
@@ -90,19 +90,19 @@ dependencies:
     .agents/skills/bepinex-mono-mod-quality-check/assets/repository/CONTRIBUTING.md: sha256:89afb2410a3c30c9bb697088d79f42b55aabf9f1864f039fccbf0f643b082d6a
     .agents/skills/bepinex-mono-mod-quality-check/assets/template-map.json: sha256:ebc85ebbd44d94f986568d5ae294c4adfa6843b59d440f1fa674fe137407891c
     .agents/skills/bepinex-mono-mod-quality-check/references/canonical-templates.md: sha256:268371468d41221932d1bef774325f682fa4bbe58907c5edd9915b5690c9e610
-    .agents/skills/bepinex-mono-mod-quality-check/references/implementation-runbook.md: sha256:94908f3cf2db47e100bcc6e99901e0aaa614696db0aa5249bfaed5f5ae25487e
+    .agents/skills/bepinex-mono-mod-quality-check/references/implementation-runbook.md: sha256:20920e7c4bf3004914507b15729302a4239c10c6d7754cd39fb213162d7beb7c
     .agents/skills/bepinex-mono-mod-quality-check/references/repository-derived-baseline.md: sha256:386b0dabcc9d657c22b1654737bb9b2d9038c3e87ec9e84bd970a3af48bcf333
-    .agents/skills/bepinex-mono-mod-quality-check/references/repository-family-alignment.md: sha256:6d9286e30808a79eb2693d36a7580a0e3fdf513b3750c968c4f46dd0b7f0a8cb
+    .agents/skills/bepinex-mono-mod-quality-check/references/repository-family-alignment.md: sha256:8d88dfe1267a2aec93ad71d7b1ba4d5148c7d5ef148ee35d3cb90568f8ce6ba7
     .agents/skills/bepinex-mono-mod-quality-check/references/repository-quality-template.md: sha256:1d52944c5da892591b2539baa8eaa17877ef3b6da966815c1c0503c71629c4e3
     .agents/skills/bepinex-mono-mod-quality-check/scripts/render_repository_files.ps1: sha256:61c5ba3f6cdc0a53d2f293e9e0bf4621f274ae34c216d6c06a27a0b6ca6e6ca0
     .agents/skills/bepinex-mono-mod-quality-check/scripts/render_workflows.ps1: sha256:d9affc8359537e3fd691a8283cbaa39cc992044138018215e2713c39ebe53232
     .agents/skills/bepinex-mono-mod-quality-check/scripts/sync_templates.ps1: sha256:15386224ed6d16041afb6008fc51a1735edc86dc4566aa3f573594392925ab70
-  content_hash: sha256:dd6d116082ec2ed95202b2ac2b580695e8dfab26f28d4305d674998bfee34956
+  content_hash: sha256:69db2b92265c4708737d93896ab6b5ee7a63ce88248249685c15f075dccf1e90
 - repo_url: aoirint/skills
   name: skills
   host: github.com
-  resolved_commit: 0833b2bb63479927238250abd6aa7774b836ff25
-  resolved_ref: 0833b2bb63479927238250abd6aa7774b836ff25
+  resolved_commit: 8a6fe2398c32d2a2bf73efbbb618e443f4675ef1
+  resolved_ref: 8a6fe2398c32d2a2bf73efbbb618e443f4675ef1
   version: unknown
   virtual_path: .apm/skills/changelog-workflow
   is_virtual: true
@@ -120,8 +120,8 @@ dependencies:
 - repo_url: aoirint/skills
   name: skills
   host: github.com
-  resolved_commit: 0833b2bb63479927238250abd6aa7774b836ff25
-  resolved_ref: 0833b2bb63479927238250abd6aa7774b836ff25
+  resolved_commit: 8a6fe2398c32d2a2bf73efbbb618e443f4675ef1
+  resolved_ref: 8a6fe2398c32d2a2bf73efbbb618e443f4675ef1
   version: unknown
   virtual_path: .apm/skills/code-quality-check
   is_virtual: true
@@ -139,8 +139,8 @@ dependencies:
 - repo_url: aoirint/skills
   name: skills
   host: github.com
-  resolved_commit: 0833b2bb63479927238250abd6aa7774b836ff25
-  resolved_ref: 0833b2bb63479927238250abd6aa7774b836ff25
+  resolved_commit: 8a6fe2398c32d2a2bf73efbbb618e443f4675ef1
+  resolved_ref: 8a6fe2398c32d2a2bf73efbbb618e443f4675ef1
   version: unknown
   virtual_path: .apm/skills/commit-message-quality-check
   is_virtual: true
@@ -158,8 +158,8 @@ dependencies:
 - repo_url: aoirint/skills
   name: skills
   host: github.com
-  resolved_commit: 0833b2bb63479927238250abd6aa7774b836ff25
-  resolved_ref: 0833b2bb63479927238250abd6aa7774b836ff25
+  resolved_commit: 8a6fe2398c32d2a2bf73efbbb618e443f4675ef1
+  resolved_ref: 8a6fe2398c32d2a2bf73efbbb618e443f4675ef1
   version: unknown
   virtual_path: .apm/skills/git-worktree-workflow
   is_virtual: true
@@ -177,8 +177,8 @@ dependencies:
 - repo_url: aoirint/skills
   name: skills
   host: github.com
-  resolved_commit: 0833b2bb63479927238250abd6aa7774b836ff25
-  resolved_ref: 0833b2bb63479927238250abd6aa7774b836ff25
+  resolved_commit: 8a6fe2398c32d2a2bf73efbbb618e443f4675ef1
+  resolved_ref: 8a6fe2398c32d2a2bf73efbbb618e443f4675ef1
   version: unknown
   virtual_path: .apm/skills/github-actions-quality-check
   is_virtual: true
@@ -198,8 +198,8 @@ dependencies:
 - repo_url: aoirint/skills
   name: skills
   host: github.com
-  resolved_commit: 0833b2bb63479927238250abd6aa7774b836ff25
-  resolved_ref: 0833b2bb63479927238250abd6aa7774b836ff25
+  resolved_commit: 8a6fe2398c32d2a2bf73efbbb618e443f4675ef1
+  resolved_ref: 8a6fe2398c32d2a2bf73efbbb618e443f4675ef1
   version: unknown
   virtual_path: .apm/skills/gitignore-workflow
   is_virtual: true
@@ -217,8 +217,8 @@ dependencies:
 - repo_url: aoirint/skills
   name: skills
   host: github.com
-  resolved_commit: 0833b2bb63479927238250abd6aa7774b836ff25
-  resolved_ref: 0833b2bb63479927238250abd6aa7774b836ff25
+  resolved_commit: 8a6fe2398c32d2a2bf73efbbb618e443f4675ef1
+  resolved_ref: 8a6fe2398c32d2a2bf73efbbb618e443f4675ef1
   version: unknown
   virtual_path: .apm/skills/issue-quality-check
   is_virtual: true
@@ -236,8 +236,8 @@ dependencies:
 - repo_url: aoirint/skills
   name: skills
   host: github.com
-  resolved_commit: 0833b2bb63479927238250abd6aa7774b836ff25
-  resolved_ref: 0833b2bb63479927238250abd6aa7774b836ff25
+  resolved_commit: 8a6fe2398c32d2a2bf73efbbb618e443f4675ef1
+  resolved_ref: 8a6fe2398c32d2a2bf73efbbb618e443f4675ef1
   version: unknown
   virtual_path: .apm/skills/lethal-company-analyze
   is_virtual: true
@@ -265,8 +265,8 @@ dependencies:
 - repo_url: aoirint/skills
   name: skills
   host: github.com
-  resolved_commit: 0833b2bb63479927238250abd6aa7774b836ff25
-  resolved_ref: 0833b2bb63479927238250abd6aa7774b836ff25
+  resolved_commit: 8a6fe2398c32d2a2bf73efbbb618e443f4675ef1
+  resolved_ref: 8a6fe2398c32d2a2bf73efbbb618e443f4675ef1
   version: unknown
   virtual_path: .apm/skills/prose-quality-check
   is_virtual: true
@@ -284,8 +284,8 @@ dependencies:
 - repo_url: aoirint/skills
   name: skills
   host: github.com
-  resolved_commit: 0833b2bb63479927238250abd6aa7774b836ff25
-  resolved_ref: 0833b2bb63479927238250abd6aa7774b836ff25
+  resolved_commit: 8a6fe2398c32d2a2bf73efbbb618e443f4675ef1
+  resolved_ref: 8a6fe2398c32d2a2bf73efbbb618e443f4675ef1
   version: unknown
   virtual_path: .apm/skills/pull-request-quality-check
   is_virtual: true
@@ -305,8 +305,8 @@ dependencies:
 - repo_url: aoirint/skills
   name: skills
   host: github.com
-  resolved_commit: 0833b2bb63479927238250abd6aa7774b836ff25
-  resolved_ref: 0833b2bb63479927238250abd6aa7774b836ff25
+  resolved_commit: 8a6fe2398c32d2a2bf73efbbb618e443f4675ef1
+  resolved_ref: 8a6fe2398c32d2a2bf73efbbb618e443f4675ef1
   version: unknown
   virtual_path: .apm/skills/release-note-workflow
   is_virtual: true
@@ -324,8 +324,8 @@ dependencies:
 - repo_url: aoirint/skills
   name: skills
   host: github.com
-  resolved_commit: 0833b2bb63479927238250abd6aa7774b836ff25
-  resolved_ref: 0833b2bb63479927238250abd6aa7774b836ff25
+  resolved_commit: 8a6fe2398c32d2a2bf73efbbb618e443f4675ef1
+  resolved_ref: 8a6fe2398c32d2a2bf73efbbb618e443f4675ef1
   version: unknown
   virtual_path: .apm/skills/rollout-workflow
   is_virtual: true
@@ -343,8 +343,8 @@ dependencies:
 - repo_url: aoirint/skills
   name: skills
   host: github.com
-  resolved_commit: 0833b2bb63479927238250abd6aa7774b836ff25
-  resolved_ref: 0833b2bb63479927238250abd6aa7774b836ff25
+  resolved_commit: 8a6fe2398c32d2a2bf73efbbb618e443f4675ef1
+  resolved_ref: 8a6fe2398c32d2a2bf73efbbb618e443f4675ef1
   version: unknown
   virtual_path: .apm/skills/security-check
   is_virtual: true
@@ -366,8 +366,8 @@ dependencies:
 - repo_url: aoirint/skills
   name: skills
   host: github.com
-  resolved_commit: 0833b2bb63479927238250abd6aa7774b836ff25
-  resolved_ref: 0833b2bb63479927238250abd6aa7774b836ff25
+  resolved_commit: 8a6fe2398c32d2a2bf73efbbb618e443f4675ef1
+  resolved_ref: 8a6fe2398c32d2a2bf73efbbb618e443f4675ef1
   version: unknown
   virtual_path: .apm/skills/software-documentation-maintenance
   is_virtual: true
@@ -385,8 +385,8 @@ dependencies:
 - repo_url: aoirint/skills
   name: skills
   host: github.com
-  resolved_commit: 0833b2bb63479927238250abd6aa7774b836ff25
-  resolved_ref: 0833b2bb63479927238250abd6aa7774b836ff25
+  resolved_commit: 8a6fe2398c32d2a2bf73efbbb618e443f4675ef1
+  resolved_ref: 8a6fe2398c32d2a2bf73efbbb618e443f4675ef1
   version: unknown
   virtual_path: .apm/skills/unity-game-analyze
   is_virtual: true
@@ -690,7 +690,7 @@ deployments:
   owners:
   - aoirint/skills/.apm/skills/bepinex-mono-mod-quality-check
   active_owner: aoirint/skills/.apm/skills/bepinex-mono-mod-quality-check
-  content_hash: sha256:94908f3cf2db47e100bcc6e99901e0aaa614696db0aa5249bfaed5f5ae25487e
+  content_hash: sha256:20920e7c4bf3004914507b15729302a4239c10c6d7754cd39fb213162d7beb7c
 - kind: project-relative
   target: agents
   value: .agents/skills/bepinex-mono-mod-quality-check/references/repository-derived-baseline.md
@@ -708,7 +708,7 @@ deployments:
   owners:
   - aoirint/skills/.apm/skills/bepinex-mono-mod-quality-check
   active_owner: aoirint/skills/.apm/skills/bepinex-mono-mod-quality-check
-  content_hash: sha256:6d9286e30808a79eb2693d36a7580a0e3fdf513b3750c968c4f46dd0b7f0a8cb
+  content_hash: sha256:8d88dfe1267a2aec93ad71d7b1ba4d5148c7d5ef148ee35d3cb90568f8ce6ba7
 - kind: project-relative
   target: agents
   value: .agents/skills/bepinex-mono-mod-quality-check/references/repository-quality-template.md
