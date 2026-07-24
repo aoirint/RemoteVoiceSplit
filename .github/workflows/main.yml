@@ -225,9 +225,10 @@ jobs:
     needs:
       - build
       - plan
-    # Alpha and other prerelease versions are authorized for GitHub-only
-    # publication. Stable and Thunderstore publication remain disabled.
-    if: needs.plan.outputs.release_mode == 'prerelease'
+    # Edge artifacts use the reserved 0.0.0 version and are never published.
+    # Every non-edge release publishes the exact verified ZIP. Numeric releases
+    # remain GitHub prereleases while this project is in public beta.
+    if: needs.plan.outputs.release_mode != 'edge'
     # Publication is a lightweight artifact and API operation with no native
     # compatibility contract or full-VM requirement.
     runs-on: ubuntu-slim
@@ -271,3 +272,28 @@ jobs:
           artifacts: ./tmp_artifacts/*.zip
           artifactErrorsFailBuild: true
           artifactContentType: application/zip
+
+      - name: Publish numeric public beta to Thunderstore
+        id: publish-thunderstore
+        if: needs.plan.outputs.release_mode == 'latest'
+        uses: ./.github/actions/publish-thunderstore
+        with:
+          artifact_path: ./tmp_artifacts/*.zip
+          token: ${{ secrets.THUNDERSTORE_TOKEN }}
+          namespace: aoirint
+          community: lethal-company
+          community_categories: |
+            mods
+            clientside
+            tweaks-and-quality-of-life
+            ai-generated
+
+      - name: Add Thunderstore summary
+        if: steps.publish-thunderstore.outcome == 'success'
+        run: |
+          {
+            echo "| Metric | Value |"
+            echo "| :----- | :---- |"
+            echo "| Thunderstore Package | [Open](${{ steps.publish-thunderstore.outputs.thunderstore_community_url }}) |"
+            echo "| Thunderstore Download | [Download](${{ steps.publish-thunderstore.outputs.thunderstore_download_url }}) |"
+          } >> "${GITHUB_STEP_SUMMARY}"

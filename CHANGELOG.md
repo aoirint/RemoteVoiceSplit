@@ -8,6 +8,8 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-07-25 UTC
+
 ### Changed
 
 - Refocused the user-facing introduction on OBS recording-track separation.
@@ -20,6 +22,20 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - Updated the APM-managed `release-note-workflow` so destination-specific
   histories retain SemVer prereleases where published without presenting
   another destination's headings as public history.
+
+### Notes
+
+- This is the first public Thunderstore release and is a beta. Complete
+  two-player OBS track separation, host/client and voice-path coverage,
+  endpoint recovery, host termination, and live configuration switching remain
+  required before stable approval.
+- Compatibility
+    - Lethal Company v81 (2026-04-17 UTC)
+        - Steam Manifest ID: `6423525044216269478`
+        - Test environment
+            - [BepInExPack][bepinexpack-package] v5.4.2305 (2026-03-17 UTC)
+    - Windows with .NET Framework 4.8
+    - OBS Studio Application Audio Capture
 
 ## [0.1.0-alpha.4] - 2026-07-23
 
@@ -159,7 +175,8 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
   prerelease identity remains in assembly metadata, the ZIP name, tag, and
   GitHub Release.
 
-[Unreleased]: https://github.com/aoirint/RemoteVoiceSplit/compare/v0.1.0-alpha.4...HEAD
+[Unreleased]: https://github.com/aoirint/RemoteVoiceSplit/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/aoirint/RemoteVoiceSplit/releases/tag/v0.1.0
 [0.1.0-alpha.4]: https://github.com/aoirint/RemoteVoiceSplit/releases/tag/v0.1.0-alpha.4
 [0.1.0-alpha.3]: https://github.com/aoirint/RemoteVoiceSplit/releases/tag/v0.1.0-alpha.3
 [0.1.0-alpha.2]: https://github.com/aoirint/RemoteVoiceSplit/releases/tag/v0.1.0-alpha.2

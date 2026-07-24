@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## v0.1.0 - 2026-07-25
 
 ### Added
 
@@ -22,7 +22,7 @@
 
 ### Notes
 
-- This will be the first public Thunderstore release and is a beta. Complete
+- This is the first public Thunderstore release and is a beta. Complete
   multiplayer voice-path, recording-track, endpoint-recovery, host-termination,
   and live-configuration coverage remains required before stable approval.
 - Compatibility
