@@ -31,6 +31,8 @@ The project maintainer is listed in [CODEOWNERS](./.github/CODEOWNERS).
   [issues](../../issues) and
   [pull requests](../../pulls) to avoid
   duplicates.
+- Include the package version, Lethal Company build, configuration, and
+  relevant entries from `BepInEx/LogOutput.log` when reporting a problem.
 - When you share logs, screenshots, or other supporting material in a public
   issue, expect maintainers to use that material within a reasonable scope
   related to the reported issue, including for understanding, reproducing,
