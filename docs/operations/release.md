@@ -7,10 +7,9 @@ prerelease publication is enabled for SemVer prerelease versions. The first
 Thunderstore publication is planned as a clearly labeled public beta. Stable
 release approval remains disabled until the complete runtime matrix passes.
 
-The project version is currently `0.1.0-alpha.4`. The Main workflow creates a
-validated package artifact and immutable GitHub prerelease. BepInEx metadata
-and the Thunderstore manifest use `0.0.0` placeholders, and no Thunderstore
-upload occurs.
+The Main workflow creates a validated package artifact and immutable GitHub
+prerelease for a SemVer prerelease. BepInEx metadata and the Thunderstore
+manifest use `0.0.0` placeholders, and no Thunderstore upload occurs.
 
 The maintainer has confirmed that the `THUNDERSTORE_TOKEN` repository secret is
 configured. Its value must never be copied into documentation, logs, workflow
@@ -94,10 +93,9 @@ Before enabling the first Thunderstore beta:
 7. Run all development, workflow, package, dependency, and documentation
    checks on the exact commit.
 
-Do not upload the current `0.1.0-alpha.4` artifact or rewrite it as a numeric
-version after the build. The project versions, generated manifest, changelog
-entries, binary metadata, archive name, and release tag must agree before the
-ZIP is built.
+Do not upload a prerelease artifact or rewrite it as a numeric version after
+the build. The project versions, generated manifest, changelog entries, binary
+metadata, archive name, and release tag must agree before the ZIP is built.
 
 ## Stable release runtime checks
 

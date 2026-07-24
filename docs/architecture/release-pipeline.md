@@ -12,7 +12,7 @@ metadata, the artifact name, and the Git tag derive from those project values.
 
 - `0.0.0` is always an edge build. Its artifact identity adds `edge`, UTC
   timestamp, and a short commit SHA; loader metadata remains `0.0.0`.
-- A SemVer prerelease such as `0.1.0-alpha.4` creates a GitHub prerelease. Its
+- A SemVer prerelease creates a GitHub prerelease. Its
   assembly versions use the numeric core, while BepInEx metadata and the
   Thunderstore manifest remain `0.0.0` because neither consumer accepts the
   prerelease identity. Its package-facing changelog remains an `Unreleased`
