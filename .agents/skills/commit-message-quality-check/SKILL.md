@@ -47,6 +47,10 @@ Reference:
      serialization and verify that decoding the serialized payload reproduces
      the validated subject and body. JSON escaping on the wire is not itself a
      failure.
+   - In PowerShell, do not assign line-oriented native-command output directly
+     when verifying multiline text. Capture the complete structured response
+     as raw text, decode it, assert that the selected value is a `[string]`,
+     and only then compare it with the candidate.
    - Do not perform the mutation until the candidate passes.
 7. Recommend the smallest correction that makes the message valid and accurate.
 8. If the diff contains multiple unrelated logical changes, recommend splitting

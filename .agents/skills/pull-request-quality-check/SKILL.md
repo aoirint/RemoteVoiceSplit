@@ -47,8 +47,11 @@ Use `Update Note`, `Discussion Note`, or `Review Note` only when the task reques
 notes. Place `Request addressed: ...` after the required alert; group retrospective notes by meaningful theme, separate
 independently reviewable themes when requested, label inferences, and omit secrets, private paths, and hidden reasoning.
 
-When using `gh`, write Markdown to a temporary file and pass `--body-file`. Verify the stored body with
-`gh pr view --json body`, correct quoting, and remove the temporary file.
+When using `gh`, write Markdown to a temporary file and pass `--body-file`.
+Verify the stored body from the complete `--json body` response, not
+line-oriented `--jq` output. In PowerShell, preserve the response as one raw
+string, decode it, require `body` to be a `[string]`, compare it with the
+candidate, and remove the temporary file.
 
 Before `gh pr merge` creates a squash or merge commit:
 
@@ -69,7 +72,8 @@ Before `gh pr merge` creates a squash or merge commit:
 6. Verify the stored commit message and trailers after merge. Preserve the
    multiline value as one string:
    - Save the full commit API JSON response to a temporary file and parse it as
-     JSON. In PowerShell, use `Get-Content -Raw | ConvertFrom-Json`.
+     JSON. In PowerShell, use `Get-Content -Raw | ConvertFrom-Json`, then
+     require `commit.message` to be a `[string]`.
    - Do not assign line-oriented output from
      `gh api --jq '.commit.message'` directly to a PowerShell variable; a
      multiline value becomes an array of lines and breaks exact comparison.
