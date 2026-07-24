@@ -26,8 +26,8 @@ incorrect audio routing may occur.**
     - Steam Manifest ID: `6423525044216269478`
     - Test environment
         - [BepInExPack][bepinexpack-package] v5.4.2305 (2026-03-17 UTC)
-    - Windows with .NET Framework 4.8
-    - OBS Studio Application Audio Capture
+- Windows with .NET Framework 4.8
+- OBS Studio Application Audio Capture
 
 Only clients that want separate remote-voice recording need this mod. The
 lobby host and other players do not need to install it. Other Lethal Company

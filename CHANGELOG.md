@@ -33,11 +33,12 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
   runtime-validation scope. Complete two-player OBS track separation,
   host/client and voice-path coverage, endpoint recovery, host termination,
   and live configuration switching remain required before a stable release.
-- Compatibility: Lethal Company v81 (2026-04-17 UTC).
-    - Steam Manifest ID: `6423525044216269478`
-    - Test environment
-        - BepInExPack v5.4.2305 (2026-03-17 UTC)
-    - Windows
+- Compatibility:
+    - Lethal Company v81 (2026-04-17 UTC).
+        - Steam Manifest ID: `6423525044216269478`
+        - Test environment
+            - BepInExPack v5.4.2305 (2026-03-17 UTC)
+    - Windows with .NET Framework 4.8
     - OBS Studio Application Audio Capture
 
 ## [0.1.0-alpha.3] - 2026-07-23
@@ -63,11 +64,12 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - Upgrading from alpha.2 does not migrate
   `Audio.FallbackToGameOutput`; configure
   `General.FallbackToGameOutput` instead.
-- Compatibility: Lethal Company v81 (2026-04-17 UTC).
-    - Steam Manifest ID: `6423525044216269478`
-    - Test environment
-        - BepInExPack v5.4.2305 (2026-03-17 UTC)
-    - Windows
+- Compatibility:
+    - Lethal Company v81 (2026-04-17 UTC).
+        - Steam Manifest ID: `6423525044216269478`
+        - Test environment
+            - BepInExPack v5.4.2305 (2026-03-17 UTC)
+    - Windows with .NET Framework 4.8
     - OBS Studio Application Audio Capture
 
 ## [0.1.0-alpha.2] - 2026-07-23
@@ -90,11 +92,12 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
   two-player OBS track separation, host/client and voice-path coverage,
   endpoint recovery, host termination, and live configuration switching remain
   required before a stable release.
-- Compatibility: Lethal Company v81 (2026-04-17 UTC).
-    - Steam Manifest ID: `6423525044216269478`
-    - Test environment
-        - BepInExPack v5.4.2305 (2026-03-17 UTC)
-    - Windows
+- Compatibility:
+    - Lethal Company v81 (2026-04-17 UTC).
+        - Steam Manifest ID: `6423525044216269478`
+        - Test environment
+            - BepInExPack v5.4.2305 (2026-03-17 UTC)
+    - Windows with .NET Framework 4.8
     - OBS Studio Application Audio Capture
 
 ## [0.1.0-alpha.1] - 2026-07-23
