@@ -19,7 +19,7 @@ incorrect audio routing may occur.**
 ## What it does
 
 - Moves voices from other players into a companion audio process.
-- Keeps music, sound effects, and the local microphone in the normal Lethal
+- Keeps music, sound effects, and other game output in the normal Lethal
   Company process.
 - Uses the current Windows multimedia default output for the companion process.
 - Mutes remote voice by default when separate routing is unavailable so it does

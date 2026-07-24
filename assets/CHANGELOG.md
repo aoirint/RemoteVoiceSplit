@@ -6,8 +6,7 @@
 
 - Separates other players' voices from game audio with a companion process, so
   each source can be recorded to a different track.
-- Leaves game audio and the local microphone in the normal Lethal Company
-  process.
+- Sends only remote-player voice playback to the companion process.
 - Uses the current Windows multimedia default output; no virtual audio device
   is required.
 - Includes `[General] Enabled` to turn voice separation on or off without
