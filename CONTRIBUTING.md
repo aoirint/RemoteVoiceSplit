@@ -31,8 +31,6 @@ The project maintainer is listed in [CODEOWNERS](./.github/CODEOWNERS).
   [issues](../../issues) and
   [pull requests](../../pulls) to avoid
   duplicates.
-- Include the package version, Lethal Company build, configuration, and
-  relevant entries from `BepInEx/LogOutput.log` when reporting a problem.
 - When you share logs, screenshots, or other supporting material in a public
   issue, expect maintainers to use that material within a reasonable scope
   related to the reported issue, including for understanding, reproducing,
@@ -76,7 +74,7 @@ notes in [README.md](./README.md).
 At minimum, install the documented .NET SDK and restore packages before building:
 
 ```powershell
-dotnet restore RemoteVoiceSplit.slnx --locked-mode
+dotnet restore --locked-mode
 ```
 
 ## Making changes
@@ -95,47 +93,32 @@ dotnet restore RemoteVoiceSplit.slnx --locked-mode
 Run the checks that match your change before opening a pull request:
 
 ```powershell
-dotnet format RemoteVoiceSplit.slnx --no-restore --verify-no-changes
-dotnet build RemoteVoiceSplit.slnx --no-restore -c Release -p:BepInExPluginVersion=0.0.0
-dotnet run --project RemoteVoiceSplit.Tests --no-build -c Release -- RemoteVoiceSplit/bin/Release/netstandard2.1/RemoteVoiceSplit.dll RemoteVoiceSplit.AudioHost/bin/Release/net48/RemoteVoiceSplit.AudioHost.exe 0.1.0-alpha.4 0.1.0-alpha.4
-pnpm --config.minimumReleaseAge=10080 --config.minimumReleaseAgeStrict=true --config.minimumReleaseAgeIgnoreMissingTime=false --config.minimumReleaseAgeExclude= dlx markdownlint-cli2@0.22.0 --config .markdownlint-cli2.yaml "**/*.md"
-shellcheck .github/actions/publish-thunderstore/publish-thunderstore.sh
-actionlint -color -pyflakes=
+dotnet format --no-restore --verify-no-changes
+docker run --rm --network none --user 1000:1000 -v ".:/workdir" davidanson/markdownlint-cli2:v0.22.1@sha256:0ed9a5f4c77ef447da2a2ac6e67caf74b214a7f80288819565e8b7d2ac148fe5
+git ls-files '*.sh' | ForEach-Object { shellcheck $_ }
+actionlint -pyflakes=
 pinact run --check --min-age 7
+$env:DOTNET_CLI_UI_LANGUAGE = 'en'
+dotnet build --no-restore
 ```
 
 Use the commands as follows:
 
-- Run locked restore, `dotnet format`, both-project build, and the deterministic
-  harness for source, project, dependency, or package-contract changes.
+- Run `dotnet format` and the environment-pinned `dotnet build` for source
+  changes.
 - Run Markdown lint for documentation changes.
+  The Docker command is the reviewed immutable path.
 - Run `shellcheck`, `actionlint`, and `pinact` when changing GitHub Actions
   workflows, composite actions, shell scripts, or related repository automation.
   ShellCheck should run before actionlint so actionlint can use its ShellCheck
   integration for inline workflow shell scripts.
 
+On Linux, run the Markdown lint command with `sudo docker` and use
+`--user "$(id -u):$(id -g)"`.
+
 For package or release changes, also verify the release documentation in
 [README.md](./README.md), the selected package-host contract, and the exact
 files copied into the final archive.
-
-The repository selects these exact bundled canonical templates:
-
-- `repository-gitattributes`;
-- `github-generate-version`;
-- `github-publish-thunderstore-action`; and
-- `github-publish-thunderstore-script`.
-
-Check authoring-time drift with:
-
-```powershell
-& .agents/skills/bepinex-mono-mod-quality-check/scripts/sync_templates.ps1 -Check -RepoRoot . -Template repository-gitattributes,github-generate-version,github-publish-thunderstore-action,github-publish-thunderstore-script
-& .agents/skills/bepinex-mono-mod-quality-check/scripts/render_repository_files.ps1 -Check -ProjectDirectory RemoteVoiceSplit -RepoRoot .
-```
-
-The contributor and pull-request files retain the repository-family license
-and contribution terms but are target-specific because this two-binary mod
-needs verification commands that the bundled single-plugin template does not
-express.
 
 ## Pull requests
 
