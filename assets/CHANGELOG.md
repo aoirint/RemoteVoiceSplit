@@ -4,28 +4,22 @@
 
 ### Added
 
-- Separates other players' voices from game audio through a dedicated companion
-  process, allowing each source to be recorded on a different track.
-- Keeps game audio and the local microphone in the normal Lethal Company
+- Separates other players' voices from game audio with a companion process, so
+  each source can be recorded to a different track.
+- Leaves game audio and the local microphone in the normal Lethal Company
   process.
-- Uses the current Windows multimedia default output without requiring a
-  virtual audio device.
-- Provides `[General] Enabled` to turn separation on or off without
+- Uses the current Windows multimedia default output; no virtual audio device
+  is required.
+- Includes `[General] Enabled` to turn voice separation on or off without
   uninstalling the package.
-- Provides `[General] FallbackToGameOutput` to keep remote voice on the normal
+- Includes `[General] FallbackToGameOutput` to keep remote voice on the normal
   game output when the companion process is unavailable.
-- Keeps the companion process available across temporary connection and audio
-  device recovery while Lethal Company remains open.
-
-### Changed
-
-- Remote voice is silent by default when the companion process cannot accept
-  it, preventing it from entering the game-audio recording track.
-- Changes made through a BepInEx configuration UI apply
-  immediately without restarting the game.
-- Marks the upcoming Thunderstore publication as a public beta.
-- Keeps recording-application details in the setup instructions instead of the
-  package summary and introduction.
+- Applies supported BepInEx configuration UI changes immediately, without
+  restarting the game.
+- Keeps the companion process available while Lethal Company is open, even
+  after temporary connection or audio-device recovery.
+- Silences remote voice by default if the companion process cannot accept it,
+  preventing it from entering the game-audio recording track.
 
 ### Notes
 
