@@ -1,7 +1,7 @@
 # Remote Voice Split
 
-Remote Voice Split separates other players' voices from the rest of the game
-audio, so each can be recorded on a different track.
+A Lethal Company mod that separates other players' voices from the rest of the
+game audio so each can be recorded on a different track.
 
 **This package is currently in public beta. Real-world testing remains limited,
 and issues such as reduced game-audio quality, latency, missing audio, or
@@ -18,15 +18,14 @@ incorrect audio routing may occur.**
 
 ## What it does
 
-Remote Voice Split moves voices from other players into a companion audio
-process. Music, sound effects, and the local microphone remain in the normal
-Lethal Company process.
-
-The companion process uses the current Windows multimedia default output.
-When separate routing is unavailable, remote voice is muted by default so it
-does not enter the game-audio track. Its OBS-selectable window remains
-available across temporary audio-device or connection recovery while the game
-runs.
+- Moves voices from other players into a companion audio process.
+- Keeps music, sound effects, and the local microphone in the normal Lethal
+  Company process.
+- Uses the current Windows multimedia default output for the companion process.
+- Mutes remote voice by default when separate routing is unavailable so it does
+  not enter the game-audio track.
+- Keeps the OBS-selectable window available during temporary audio-device or
+  connection recovery while the game runs.
 
 ## Setup
 
@@ -40,21 +39,24 @@ runs.
 
 BepInEx creates
 `BepInEx/config/com.aoirint.remotevoicesplit.cfg` after the first launch.
-Set `[General] Enabled = false` to disable voice separation and keep remote
-voice on the normal game output. Set
-`[General] FallbackToGameOutput = true` to keep remote voice audible through
-the normal game output only when separate process output cannot accept it.
-Changes made through a BepInEx configuration UI apply immediately. Either
-choice can place remote voice in the game-audio track.
+
+| Name | Type | Default | Description |
+| :--- | :--- | :------ | :---------- |
+| `Enabled` | bool | true | Set to false to disable voice separation and keep remote voice on the normal game output. |
+| `FallbackToGameOutput` | bool | false | Set to true to use the normal game output when separate output is unavailable. |
+
+Either setting can place remote voice in the game-audio track. Changes made
+through a BepInEx configuration UI apply immediately.
 
 ## Who needs to install
 
-Install the mod only on clients that want to record remote player voices
-separately.
+Client-side only. The host and other players do not need to install this mod.
+
+Install it on each client that wants to record remote player voices separately.
 
 ## AI Disclosure
 
-Some parts of this project were developed with AI tools based on large
-language models, including agent-based tools. The project maintainer reviews
-the code. This disclosure is made in compliance with Thunderstore and
-community policies.
+Some parts of this project were developed with AI tools based on large language
+models (LLMs), including agent-based tools. The project maintainer reviews the
+code. This disclosure is made in compliance with Thunderstore and community
+policies.
