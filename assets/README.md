@@ -9,10 +9,9 @@ incorrect audio routing may occur.**
 
 ## Compatibility
 
-- Lethal Company v81
-    - Steam Build ID: `22825947`
-    - Steam Manifest ID: `6423525044216269478`
-- BepInEx 5 through BepInExPack 5.4.2305
+- Lethal Company v81 (Manifest ID: `6423525044216269478`)
+    - Test environment
+        - [BepInExPack][bepinexpack-package] v5.4.2305
 - Windows with .NET Framework 4.8
 - OBS Studio Application Audio Capture
 
@@ -60,3 +59,5 @@ Some parts of this project were developed with AI tools based on large language
 models (LLMs), including agent-based tools. The project maintainer reviews the
 code. This disclosure is made in compliance with Thunderstore and community
 policies.
+
+[bepinexpack-package]: https://thunderstore.io/c/lethal-company/p/BepInEx/BepInExPack/
