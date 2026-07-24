@@ -3,20 +3,19 @@
 ## Scope
 
 Pull Request and Main workflows build and validate the source. GitHub
-prerelease publication is enabled for SemVer prerelease versions. The selected
-numeric release is a clearly labeled public beta and publishes to
-Thunderstore. Stable-release approval remains disabled until the complete
-runtime matrix passes.
+prerelease publication is enabled for SemVer prerelease versions. The first
+Thunderstore publication is planned as a clearly labeled public beta. Stable
+release approval remains disabled until the complete runtime matrix passes.
 
 The Main workflow creates a validated package artifact and immutable GitHub
-prerelease for every non-edge version. Numeric public-beta packages also
-publish to Thunderstore. BepInEx metadata and the Thunderstore manifest use
-the numeric project version.
+prerelease for a SemVer prerelease. BepInEx metadata and the Thunderstore
+manifest use `0.0.0` placeholders, and no Thunderstore upload occurs.
 
 The maintainer has confirmed that the `THUNDERSTORE_TOKEN` repository secret is
 configured. Its value must never be copied into documentation, logs, workflow
-inputs, or release evidence. The workflow exposes the token only to the
-public-beta Thunderstore publishing step and never prints it.
+inputs, or release evidence. The current workflow still lacks an authorized
+numeric-beta publication path, so this documentation change cannot upload a
+package.
 
 Version classification, staging, ZIP creation, and checksums belong to
 `.github/workflows/main.yml`. Assembly and archive validation belongs to the
@@ -70,19 +69,33 @@ A push to `main`:
 Packaging is CI-owned. Download an edge artifact from the successful Main
 workflow and verify `SHA256SUMS` before extraction.
 
-## Public beta publication
+## Public beta publication gates
 
-Numeric public beta packages use a nonzero three-part package version
-because Thunderstore does not accept prerelease suffixes. The numeric version
-is an artifact identity, not a stable-quality claim. The package beta notice
-defines the user-facing quality and validation scope.
+Before enabling the first Thunderstore beta:
 
-The Main workflow creates a GitHub prerelease, then submits the same verified
-ZIP to Thunderstore.
+1. Install the exact validated ZIP through a clean Lethal Company v81 BepInEx
+   profile.
+2. Run a two-player smoke test that confirms the plugin loads, the helper
+   starts outside the game process tree, remote voice reaches the separate
+   process, game audio remains in `Lethal Company.exe`, and shutdown leaves no
+   helper process behind.
+3. Use a nonzero three-part numeric package version. Thunderstore does not
+   accept prerelease suffixes, so the numeric version is an artifact identity,
+   not a stable-quality claim.
+4. Put the beta notice at the start of the packaged `README.md`, in the
+   manifest description, and in both versioned changelog entries.
+5. Confirm the Thunderstore namespace, Lethal Company community, and selected
+   categories. Confirm the configured token can publish for that namespace
+   without exposing its value.
+6. Review and enable a workflow path that marks the GitHub release as a
+   prerelease, submits the same verified ZIP to Thunderstore, and remains
+   limited to the explicitly selected numeric beta version.
+7. Run all development, workflow, package, dependency, and documentation
+   checks on the exact commit.
 
-Do not rewrite a prerelease artifact as a numeric version after the build. The
-project versions, generated manifest, changelog entries, binary metadata,
-archive name, and release tag must agree before the ZIP is built.
+Do not upload a prerelease artifact or rewrite it as a numeric version after
+the build. The project versions, generated manifest, changelog entries, binary
+metadata, archive name, and release tag must agree before the ZIP is built.
 
 ## Stable release runtime checks
 

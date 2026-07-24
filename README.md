@@ -116,9 +116,9 @@ runtime installation, see
 ## Release status
 
 CI owns creation of the validated Thunderstore-compatible ZIP. Pushes to
-`main` produce edge artifacts, SemVer prereleases publish only to GitHub, and
-the selected numeric public beta publishes the same verified ZIP to GitHub and
-Thunderstore.
+`main` produce edge artifacts, and SemVer prereleases publish only to GitHub.
+Thunderstore public-beta publication remains a separate reviewed workflow
+change.
 
 See [release operations](docs/operations/release.md) for archive validation,
 runtime gates, publication steps, and recovery.

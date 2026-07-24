@@ -41,9 +41,9 @@ process, tests, package contents, and user instructions are target-specific.
 | Game API, patch timing, and mod set | Confirmed statically and by deterministic branch tests; audible runtime pending | Postfix `StartOfRound.RefreshPlayerVoicePlaybackObjects()` after v81 assigns remote `AudioSource` objects. Host/client, death, spectating, and walkie-talkie scenarios exercise the production selection policy. Clean BepInEx plus this mod is the supported validation set; Unity filter ordering and third-party patch interaction remain unverified. |
 | OBS process capture | Confirmed statically; runtime pending | Windows captures a selected process and descendants. The audio host must be outside the game process tree; see [OBS process audio capture](../domain/obs-process-audio-capture.md). |
 | Package host | Confirmed | Thunderstore Lethal Company package using the repository-family archive layout. |
-| Release mode | Confirmed | Every non-edge project version publishes an immutable GitHub prerelease. Numeric public-beta packages also publish the same verified ZIP to Thunderstore. Stable approval remains disabled. |
-| GitHub Actions and Releases | Configured for public beta | The public repository enforces protected-branch checks and pinned Actions. Workflows retain validated artifacts and publish only after integrated lint, test, plan, build, archive, and checksum gates pass. |
-| Thunderstore | Yes; numeric beta publication authorized | The `THUNDERSTORE_TOKEN` is configured and its value was not inspected. The workflow uses the `aoirint` namespace, the Lethal Company community, and its declared categories. |
+| Release mode | Confirmed | A SemVer prerelease publishes an immutable GitHub prerelease. The first Thunderstore publication is selected as a numeric, clearly labeled public beta, but its workflow path is not enabled. Stable approval remains disabled. |
+| GitHub Actions and Releases | Confirmed for prereleases | The public repository enforces protected-branch checks and pinned Actions. Workflows retain validated artifacts and publish SemVer prereleases only after integrated lint, test, plan, build, archive, and checksum gates pass. |
+| Thunderstore | Yes; publication blocked | Package assets and inert publisher tooling are retained. The maintainer confirms that `THUNDERSTORE_TOKEN` is configured; its value was not inspected. The numeric-beta workflow path, namespace and category confirmation, minimum multiplayer smoke test, and publication authorization remain blocked. |
 | APM | Yes | The pinned family Skill set is retained. Project metadata changes without changing dependency pins. |
 
 ## Selected design
@@ -92,11 +92,31 @@ process-lifetime state. `Plugin.OnDestroy` no longer exists.
 test verifies both the absence of component-destruction cleanup and the
 application-quit cleanup call path.
 
-## Release boundary
+## Blocked release branches
 
-The selected release is authorized as a public beta. Its package beta notice
-defines the user-facing quality and validation scope; it does not claim stable
-release approval.
+The first public Thunderstore beta remains blocked by:
+
+- no authorized workflow path for a numeric beta;
+- no confirmed namespace, community, and category inputs; and
+- no clean-profile two-player smoke test of the exact package artifact.
+
+The broader stable-release approval also remains blocked by:
+
+- Clean-profile two-player runtime validation has not run.
+- OBS source enumeration and two-track recording have not been observed.
+- Persistent same-process session recovery and process-lifetime plugin
+  ownership have passed the harness but have not been retested through a
+  complete target-game startup.
+- Physical default-endpoint changes, endpoint disconnection, and game-process
+  crashes have not been observed.
+- Default-silent and opt-out fallback behavior have not been observed with a
+  remote player in the target game.
+
+The beta-specific blockers prevent a Thunderstore upload today. Once those
+gates pass, the broader runtime gaps may remain explicit beta limitations, but
+they continue to prevent stable compatibility approval. None of these gaps
+blocks a clearly labeled GitHub alpha, deterministic implementation, or
+package validation.
 
 ## Completed static verification
 
