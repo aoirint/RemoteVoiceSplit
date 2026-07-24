@@ -178,7 +178,14 @@ internal static class PackageContract
 
     private static void ValidateReadme(string readme)
     {
-        string[] requiredClaims = { "Remote Voice Split", "Lethal Company v81", "BepInEx 5", "OBS Studio" };
+        string[] requiredClaims =
+        {
+            "Remote Voice Split",
+            "Lethal Company v81",
+            "BepInExPack",
+            "v5.4.2305",
+            "OBS Studio",
+        };
         foreach (string claim in requiredClaims)
         {
             if (!readme.Contains(claim, StringComparison.Ordinal))
@@ -461,6 +468,18 @@ internal static class PackageContractTests
             AssertRejected("missing-process", MutateAssembly(validSources, module => RemoveAttribute(module, "BepInEx.BepInProcess")), tempRoot, expectedVersion, "Expected exactly one BepInEx.BepInProcess attribute");
             AssertRejected("wrong-process", MutateAssembly(validSources, module => SetAttributeArgument(module, "BepInEx.BepInProcess", 0, "Wrong.exe")), tempRoot, expectedVersion, "process restriction is incorrect");
             AssertRejected("readme-claim", Replace(validSources, "README.md", new("README.md", Encoding.UTF8.GetBytes("incomplete"))), tempRoot, expectedVersion, "README is missing required claim");
+            AssertRejected(
+                "readme-bepinexpack-claim",
+                ReplaceText(validSources, "README.md", "BepInExPack", "LoaderPackage"),
+                tempRoot,
+                expectedVersion,
+                "README is missing required claim: BepInExPack");
+            AssertRejected(
+                "readme-bepinexpack-version",
+                ReplaceText(validSources, "README.md", "v5.4.2305", "v0.0.0"),
+                tempRoot,
+                expectedVersion,
+                "README is missing required claim: v5.4.2305");
             AssertRejected("changelog", Replace(validSources, "CHANGELOG.md", new("CHANGELOG.md", Encoding.UTF8.GetBytes("# Changelog"))), tempRoot, expectedVersion, "changelog is missing");
             if (string.Equals(expectedVersion, "0.0.0", StringComparison.Ordinal))
             {
@@ -702,6 +721,19 @@ internal static class PackageContractTests
         string name,
         PackageFixtureBuilder.ArchiveSource replacement) =>
         sources.Select(source => string.Equals(source.Name, name, StringComparison.Ordinal) ? replacement : source);
+
+    private static IEnumerable<PackageFixtureBuilder.ArchiveSource> ReplaceText(
+        IReadOnlyList<PackageFixtureBuilder.ArchiveSource> sources,
+        string name,
+        string oldValue,
+        string newValue)
+    {
+        PackageFixtureBuilder.ArchiveSource source =
+            sources.Single(item => string.Equals(item.Name, name, StringComparison.Ordinal));
+        string text = Encoding.UTF8.GetString(source.Content);
+        string replacement = text.Replace(oldValue, newValue, StringComparison.Ordinal);
+        return Replace(sources, name, new(name, Encoding.UTF8.GetBytes(replacement)));
+    }
 
     private static byte[] ManifestBytes(
         string version,
