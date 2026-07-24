@@ -1,9 +1,17 @@
 # Remote Voice Split
 
-Remote Voice Split moves voices from other Lethal Company players into a
-separate audio process. Capture **Lethal Company Remote Voice Split** with OBS
-Studio's Application Audio Capture and assign it to a different recording
-track from `Lethal Company.exe`.
+Remote Voice Split separates other players' voices from the rest of the game
+audio, so each can be recorded on a different track.
+
+## Beta Status
+
+This package is a public beta. The implementation and automated package checks
+are complete, but the full supported-build runtime matrix is not. Audio
+routing or recovery can still fail in scenarios that have not been observed
+in live multiplayer testing.
+
+If you report a problem, include the package version, Lethal Company build,
+configuration, and relevant entries from `BepInEx/LogOutput.log`.
 
 ## Compatibility
 

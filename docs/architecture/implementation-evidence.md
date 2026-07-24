@@ -41,9 +41,9 @@ process, tests, package contents, and user instructions are target-specific.
 | Game API, patch timing, and mod set | Confirmed statically and by deterministic branch tests; audible runtime pending | Postfix `StartOfRound.RefreshPlayerVoicePlaybackObjects()` after v81 assigns remote `AudioSource` objects. Host/client, death, spectating, and walkie-talkie scenarios exercise the production selection policy. Clean BepInEx plus this mod is the supported validation set; Unity filter ordering and third-party patch interaction remain unverified. |
 | OBS process capture | Confirmed statically; runtime pending | Windows captures a selected process and descendants. The audio host must be outside the game process tree; see [OBS process audio capture](../domain/obs-process-audio-capture.md). |
 | Package host | Confirmed | Thunderstore Lethal Company package using the repository-family archive layout. |
-| Release mode | Confirmed | Project version `0.1.0-alpha.4` publishes an immutable GitHub prerelease. Stable GitHub and Thunderstore publication remain disabled. |
+| Release mode | Confirmed | Project version `0.1.0-alpha.4` publishes an immutable GitHub prerelease. The first Thunderstore publication is now selected as a numeric, clearly labeled public beta, but its workflow path is not enabled. Stable approval remains disabled. |
 | GitHub Actions and Releases | Confirmed through `0.1.0-alpha.3`; `0.1.0-alpha.4` pending | The public repository enforces protected-branch checks and pinned Actions. Workflows retain validated artifacts and publish SemVer prereleases only after integrated lint, test, plan, build, archive, and checksum gates pass. |
-| Thunderstore | Yes; publication blocked | Package assets and inert publisher tooling are retained. Namespace authorization, runtime evidence, and publication authorization are blocked. |
+| Thunderstore | Yes; publication blocked | Package assets and inert publisher tooling are retained. The maintainer confirms that `THUNDERSTORE_TOKEN` is configured; its value was not inspected. The numeric-beta workflow path, namespace and category confirmation, minimum multiplayer smoke test, and publication authorization remain blocked. |
 | APM | Yes | The pinned family Skill set is retained. Project metadata changes without changing dependency pins. |
 
 ## Selected design
@@ -94,6 +94,14 @@ application-quit cleanup call path.
 
 ## Blocked release branches
 
+The first public Thunderstore beta remains blocked by:
+
+- no authorized workflow path for a numeric beta;
+- no confirmed namespace, community, and category inputs; and
+- no clean-profile two-player smoke test of the exact package artifact.
+
+The broader stable-release approval also remains blocked by:
+
 - Clean-profile two-player runtime validation has not run.
 - OBS source enumeration and two-track recording have not been observed.
 - Persistent same-process session recovery and process-lifetime plugin
@@ -103,11 +111,12 @@ application-quit cleanup call path.
   crashes have not been observed.
 - Default-silent and opt-out fallback behavior have not been observed with a
   remote player in the target game.
-- Publication credentials and namespace authorization are not configured.
 
-These blockers prevent a compatibility approval, stable GitHub Release, or
-Thunderstore upload. They do not block a clearly labeled GitHub alpha,
-deterministic implementation, or package validation.
+The beta-specific blockers prevent a Thunderstore upload today. Once those
+gates pass, the broader runtime gaps may remain explicit beta limitations, but
+they continue to prevent stable compatibility approval. None of these gaps
+blocks a clearly labeled GitHub alpha, deterministic implementation, or
+package validation.
 
 ## Completed static verification
 

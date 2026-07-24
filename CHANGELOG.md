@@ -11,6 +11,10 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 ### Changed
 
 - Refocused the user-facing introduction on OBS recording-track separation.
+- Defined the first Thunderstore publication as a clearly labeled public beta
+  whose numeric package version does not imply stable-release approval.
+- Removed the product-specific recording application name from package-list
+  and introductory descriptions while retaining it in detailed setup guidance.
 
 ## [0.1.0-alpha.4] - 2026-07-23
 

@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Changed
+
+- Marked the upcoming Thunderstore publication as a public beta.
+- Kept recording-application details in the setup instructions instead of the
+  package summary and introduction.
+
 ## v0.1.0-alpha.4 - 2026-07-23
 
 ### Changed

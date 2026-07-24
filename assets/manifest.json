@@ -2,7 +2,7 @@
   "name": "RemoteVoiceSplit",
   "version_number": "0.0.0",
   "website_url": "https://github.com/aoirint/RemoteVoiceSplit",
-  "description": "[v81] Exposes other players' voices as a separate OBS-capturable process.",
+  "description": "[Beta][v81] Separates other players' voices from game audio for independent recording.",
   "dependencies": [
     "BepInEx-BepInExPack-5.4.2305"
   ]

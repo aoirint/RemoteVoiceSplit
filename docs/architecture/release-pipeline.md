@@ -16,8 +16,12 @@ metadata, the artifact name, and the Git tag derive from those project values.
   assembly versions use the numeric core, while BepInEx metadata and the
   Thunderstore manifest remain `0.0.0` because neither consumer accepts the
   prerelease identity.
-- A nonzero numeric version is stable only with matching developer and package
-  changelog entries and completed runtime checks.
+- A nonzero numeric version can identify a public Thunderstore beta because
+  Thunderstore package versions have no prerelease suffix. Beta or stable
+  quality status is a separate release-policy decision and must be explicit in
+  the packaged README, manifest description, changelogs, and publication gate.
+- Stable approval additionally requires matching developer and package
+  changelog entries and completed stable runtime checks.
 
 ## Artifact flow
 
@@ -33,8 +37,10 @@ job downloads that exact artifact and never rebuilds it.
 
 For a prerelease, the pinned release action creates an immutable GitHub
 prerelease for the integrated commit and attaches only the validated ZIP.
-Stable GitHub and Thunderstore publication remain disabled until separately
-authorized after runtime validation.
+The current workflow stops there. A future reviewed beta-publication change
+may authorize one selected numeric version, keep its GitHub Release marked as
+a prerelease, and submit the same verified ZIP to Thunderstore. Stable
+publication remains separately gated by the complete runtime matrix.
 
 ## Failure boundaries
 
@@ -43,5 +49,5 @@ packaging, assembly inspection, archive validation, or checksum failure blocks
 artifact upload and publication. Edge builds skip publication.
 
 An existing release for the same tag fails instead of replacing assets. Edge
-and stable builds currently skip publication. Recovery is documented in
+and numeric builds currently skip publication. Recovery is documented in
 [release operations](../operations/release.md).
