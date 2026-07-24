@@ -139,8 +139,6 @@ package validation.
 - NuGet reports no known vulnerable or deprecated package in the locked graph.
 - ShellCheck, actionlint, pinact, canonical repository-file rendering, and
   Markdown lint pass.
-- APM 0.25.0 reproduced the locked Skill files without drift. Its CI audit
-  currently reports a `config-consistency` failure because the installed
-  subpath dependency directories do not contain their source `apm.yml`; the
-  same audit reports ref consistency, deployed files, package set, subset
-  selection, and on-disk drift as clean.
+- APM 0.26.0 reproduces the locked Skill files without drift. Its CI audit
+  passes all checks, including `config-consistency` for the installed virtual
+  Skill dependencies.
