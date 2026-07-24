@@ -97,7 +97,15 @@ jobs:
           set -euo pipefail
           if [[ "${{ steps.generate-version.outputs.release_mode }}" =~ ^(latest|prerelease)$ ]]; then
             grep -Fq "## [${{ steps.project-version.outputs.version }}]" CHANGELOG.md
+          fi
+          if [[ "${{ steps.generate-version.outputs.release_mode }}" == "latest" ]]; then
             grep -Fq "## v${{ steps.project-version.outputs.version }}" assets/CHANGELOG.md
+          elif [[ "${{ steps.generate-version.outputs.release_mode }}" == "prerelease" ]]; then
+            grep -Fq "## Unreleased" assets/CHANGELOG.md
+            if grep -Eq '^## v[0-9]+\.[0-9]+\.[0-9]+-[0-9A-Za-z]' assets/CHANGELOG.md; then
+              echo "Package-facing changelog must not include GitHub-only prerelease headings." >&2
+              exit 1
+            fi
           fi
 
       - name: Resolve package name

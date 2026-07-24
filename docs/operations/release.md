@@ -43,6 +43,11 @@ numeric-core version. The plugin must also contain exactly one matching
 `BepInPlugin` and `BepInProcess` attribute. For a prerelease, the plugin
 attribute version is `0.0.0`.
 
+The packaged changelog describes only versions published through Thunderstore.
+Edge and GitHub-only prerelease artifacts package its `Unreleased` draft and
+must not add prerelease version headings. The canonical developer
+`CHANGELOG.md` retains the complete GitHub alpha history.
+
 All entries must be regular root files with safe names. The validator rejects
 absolute paths, traversal, backslashes, links, duplicates, unexpected files,
 additional binaries, excessive entry or expanded size, extreme compression
@@ -131,17 +136,20 @@ be closed before stable-release approval.
 ## Prepare a GitHub prerelease
 
 1. Add a complete SemVer prerelease section to `CHANGELOG.md`.
-2. Add the same version to `assets/CHANGELOG.md`.
+2. Consolidate still-relevant user-facing changes under `Unreleased` in
+   `assets/CHANGELOG.md`; do not add a GitHub-only prerelease heading there.
 3. Set `Version` in both project files to that prerelease version.
-4. Record pending runtime validation in both changelogs.
+4. Record pending runtime validation in the developer changelog and the
+   package-facing `Unreleased` notes.
 5. Run all development, workflow, package, dependency, and documentation
    checks.
 6. Push the reviewed commit to `main`.
 
 CI keeps the prerelease identity in assembly metadata, the ZIP name, tag, and
 GitHub Release. It supplies `0.0.0` only to the BepInEx plugin attribute and
-Thunderstore manifest, then publishes the validated ZIP to GitHub as a
-prerelease. Thunderstore is not contacted.
+Thunderstore manifest, packages the user-facing changelog as an `Unreleased`
+draft, then publishes the validated ZIP to GitHub as a prerelease. Thunderstore
+is not contacted.
 
 ## Prepare a stable release
 

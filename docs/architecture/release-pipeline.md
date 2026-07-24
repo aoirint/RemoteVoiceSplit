@@ -15,7 +15,9 @@ metadata, the artifact name, and the Git tag derive from those project values.
 - A SemVer prerelease such as `0.1.0-alpha.4` creates a GitHub prerelease. Its
   assembly versions use the numeric core, while BepInEx metadata and the
   Thunderstore manifest remain `0.0.0` because neither consumer accepts the
-  prerelease identity.
+  prerelease identity. Its package-facing changelog remains an `Unreleased`
+  draft without GitHub-only prerelease headings; the canonical developer
+  changelog retains that history.
 - A nonzero numeric version can identify a public Thunderstore beta because
   Thunderstore package versions have no prerelease suffix. Beta or stable
   quality status is a separate release-policy decision and must be explicit in
