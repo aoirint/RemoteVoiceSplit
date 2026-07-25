@@ -46,8 +46,10 @@ and repeatable maintainer procedures.
 - [Release](operations/release.md) defines packaging, archive validation,
   public-beta and stable publication gates, CI, GitHub Release, and recovery
   procedures.
-- [Icon authoring](icon-authoring.md) defines the editable package-icon source,
-  rendering, and verification contract.
+## Release assets
+
+- [Icon authoring](release/icon-authoring.md) defines the editable package-icon
+  source and generated `assets/icon.png`.
 
 The root [README](../README.md) is the user-facing installation and
 configuration entry point.
