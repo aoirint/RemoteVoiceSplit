@@ -406,6 +406,22 @@ internal static class PackageContractTests
     {
         string expectedManifestVersion =
             PackageContract.ResolveManifestVersion(expectedVersion);
+
+        // Mutation fixtures reuse the built binaries. For an edge artifact
+        // those binaries intentionally carry conservative loader metadata, so
+        // validate the completed package directly instead of treating it as a
+        // stable fixture.
+        if (!string.Equals(expectedVersion, expectedArtifactVersion, StringComparison.Ordinal))
+        {
+            if (archivePath is null)
+            {
+                throw new InvalidDataException("An edge package archive is required for contract validation.");
+            }
+
+            PackageContract.Validate(archivePath, expectedVersion, expectedArtifactVersion);
+            return;
+        }
+
         string tempRoot = Path.Combine(Path.GetTempPath(), $"remote-voice-split-package-tests-{Guid.NewGuid():N}");
         Directory.CreateDirectory(tempRoot);
         try
