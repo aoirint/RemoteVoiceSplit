@@ -110,8 +110,10 @@ internal static class PackageContract
             }
         }
 
-        string expectedPluginVersion = ResolvePluginVersion(expectedProjectVersion);
-        string expectedManifestVersion = ResolveManifestVersion(expectedProjectVersion);
+        // Edge artifacts keep the source project version for assembly identity,
+        // but use non-stable loader and manifest metadata in the package.
+        string expectedPluginVersion = ResolvePluginVersion(expectedArtifactVersion);
+        string expectedManifestVersion = ResolveManifestVersion(expectedArtifactVersion);
         ValidatePluginAssembly(
             ReadEntry(archive, "RemoteVoiceSplit.dll"),
             expectedProjectVersion,
