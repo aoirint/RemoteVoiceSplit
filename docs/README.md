@@ -46,6 +46,7 @@ and repeatable maintainer procedures.
 - [Release](operations/release.md) defines packaging, archive validation,
   public-beta and stable publication gates, CI, GitHub Release, and recovery
   procedures.
+
 ## Release assets
 
 - [Icon authoring](release/icon-authoring.md) defines the editable package-icon
