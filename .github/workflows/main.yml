@@ -17,8 +17,7 @@ defaults:
     shell: bash
 
 jobs:
-  checks:
-    name: Checks
+  lint:
     # Revalidate the exact integrated commit before any artifact can be built.
     runs-on: ubuntu-slim
     timeout-minutes: 10
@@ -120,7 +119,7 @@ jobs:
   build:
     name: Build
     needs:
-      - checks
+      - lint
       - test
       - plan
     # Build keeps ubuntu-latest because packaging currently relies on
