@@ -63,7 +63,7 @@ publication cooldown, runtime behavior, and content hash.
 
 ## Restore Agent Skills
 
-Use APM CLI 0.26.0:
+Use APM CLI 0.27.0:
 
 ```powershell
 apm install --frozen

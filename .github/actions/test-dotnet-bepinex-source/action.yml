@@ -1,0 +1,41 @@
+name: Test source and package contract
+description: Build both binaries and run deterministic audio and package tests.
+
+runs:
+  using: composite
+  steps:
+    - name: Set up locked .NET environment
+      uses: ./.github/actions/setup-dotnet-locked
+
+    - name: Build release configuration
+      shell: bash
+      run: |
+        set -euo pipefail
+        project_version=$(dotnet msbuild \
+          RemoteVoiceSplit/RemoteVoiceSplit.csproj \
+          -getProperty:Version -nologo | tr -d '\r' | xargs)
+        dotnet_build_args=(--no-restore --configuration Release)
+        if [[ "${project_version}" == *"-"* ]]; then
+          # BepInEx 5 parses plugin metadata as System.Version and rejects
+          # SemVer prerelease labels. Keep release identity in Version.
+          dotnet_build_args+=(-p:BepInExPluginVersion=0.0.0)
+        fi
+        dotnet build RemoteVoiceSplit.slnx "${dotnet_build_args[@]}"
+
+    - name: Run deterministic audio and package-contract tests
+      shell: bash
+      run: |
+        set -euo pipefail
+        project_version=$(dotnet msbuild \
+          RemoteVoiceSplit/RemoteVoiceSplit.csproj \
+          -getProperty:Version -nologo | tr -d '\r' | xargs)
+        host_version=$(dotnet msbuild \
+          RemoteVoiceSplit.AudioHost/RemoteVoiceSplit.AudioHost.csproj \
+          -getProperty:Version -nologo | tr -d '\r' | xargs)
+        [[ "${project_version}" == "${host_version}" ]]
+        dotnet run \
+          --project RemoteVoiceSplit.Tests \
+          --no-build --configuration Release -- \
+          RemoteVoiceSplit/bin/Release/netstandard2.1/RemoteVoiceSplit.dll \
+          RemoteVoiceSplit.AudioHost/bin/Release/net48/RemoteVoiceSplit.AudioHost.exe \
+          "${project_version}" "${project_version}"
