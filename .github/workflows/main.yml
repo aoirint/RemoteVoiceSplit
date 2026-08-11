@@ -17,7 +17,8 @@ defaults:
     shell: bash
 
 jobs:
-  lint:
+  checks:
+    name: Checks
     # Revalidate the exact integrated commit before any artifact can be built.
     runs-on: ubuntu-slim
     timeout-minutes: 10
@@ -32,6 +33,7 @@ jobs:
         uses: ./.github/actions/lint-source
 
   test:
+    name: Test
     # Smoke-test both Windows-targeted outputs on the oldest supported image.
     runs-on: windows-2022
 
@@ -45,6 +47,7 @@ jobs:
         uses: ./.github/actions/test-source
 
   plan:
+    name: Plan
     # Planning resolves release state but cannot mutate source or GitHub.
     runs-on: ubuntu-slim
     timeout-minutes: 5
@@ -115,8 +118,9 @@ jobs:
           steps.generate-version.outputs.app_version }}.zip" >> "${GITHUB_OUTPUT}"
 
   build:
+    name: Build
     needs:
-      - lint
+      - checks
       - test
       - plan
     # Build keeps ubuntu-latest because packaging currently relies on
@@ -222,6 +226,7 @@ jobs:
           } >> "${GITHUB_STEP_SUMMARY}"
 
   release:
+    name: Release
     needs:
       - build
       - plan
