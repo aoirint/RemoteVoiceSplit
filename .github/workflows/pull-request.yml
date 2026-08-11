@@ -16,25 +16,30 @@ permissions:
   contents: read
 
 jobs:
-  lint:
+  check:
+    name: Check
     # Keep proposed source validation separate from publishing privileges.
     runs-on: ubuntu-slim
     timeout-minutes: 10
 
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Check out proposed source
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
 
-      - uses: ./.github/actions/lint-source
-
+      - name: Run source checks
+        uses: ./.github/actions/check-dotnet-bepinex-source
   test:
+    name: Test
     # Smoke-test both Windows-targeted outputs on the oldest supported image.
     runs-on: windows-2022
 
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Check out proposed source
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
 
-      - uses: ./.github/actions/test-source
+      - name: Run source tests
+        uses: ./.github/actions/test-dotnet-bepinex-source

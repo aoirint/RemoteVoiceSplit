@@ -139,6 +139,6 @@ package validation.
 - NuGet reports no known vulnerable or deprecated package in the locked graph.
 - ShellCheck, actionlint, pinact, canonical repository-file rendering, and
   Markdown lint pass.
-- APM 0.26.0 reproduces the locked Skill files without drift. Its CI audit
+- APM 0.27.0 reproduces the locked Skill files without drift. Its CI audit
   passes all checks, including `config-consistency` for the installed virtual
   Skill dependencies.

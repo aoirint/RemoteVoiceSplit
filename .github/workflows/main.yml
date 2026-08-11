@@ -17,7 +17,8 @@ defaults:
     shell: bash
 
 jobs:
-  lint:
+  check:
+    name: Check
     # Revalidate the exact integrated commit before any artifact can be built.
     runs-on: ubuntu-slim
     timeout-minutes: 10
@@ -29,9 +30,10 @@ jobs:
           persist-credentials: false
 
       - name: Run shared source gate
-        uses: ./.github/actions/lint-source
+        uses: ./.github/actions/check-dotnet-bepinex-source
 
   test:
+    name: Test
     # Smoke-test both Windows-targeted outputs on the oldest supported image.
     runs-on: windows-2022
 
@@ -42,9 +44,10 @@ jobs:
           persist-credentials: false
 
       - name: Run shared test and package gate
-        uses: ./.github/actions/test-source
+        uses: ./.github/actions/test-dotnet-bepinex-source
 
   plan:
+    name: Plan
     # Planning resolves release state but cannot mutate source or GitHub.
     runs-on: ubuntu-slim
     timeout-minutes: 5
@@ -87,7 +90,7 @@ jobs:
 
       - name: Generate version plan
         id: generate-version
-        uses: ./.github/actions/generate-version
+        uses: ./.github/actions/resolve-bepinex-version
         with:
           csproj_file: "RemoteVoiceSplit/RemoteVoiceSplit.csproj"
           write_files: false
@@ -115,8 +118,9 @@ jobs:
           steps.generate-version.outputs.app_version }}.zip" >> "${GITHUB_OUTPUT}"
 
   build:
+    name: Build
     needs:
-      - lint
+      - check
       - test
       - plan
     # Build keeps ubuntu-latest because packaging currently relies on
@@ -133,7 +137,7 @@ jobs:
           persist-credentials: false
 
       - name: Set up locked .NET environment
-        uses: ./.github/actions/setup-dotnet
+        uses: ./.github/actions/setup-dotnet-locked
 
       - name: Build release configuration
         run: |
@@ -222,6 +226,7 @@ jobs:
           } >> "${GITHUB_STEP_SUMMARY}"
 
   release:
+    name: Release
     needs:
       - build
       - plan
@@ -276,7 +281,7 @@ jobs:
       - name: Publish numeric public beta to Thunderstore
         id: publish-thunderstore
         if: needs.plan.outputs.release_mode == 'latest'
-        uses: ./.github/actions/publish-thunderstore
+        uses: ./.github/actions/deploy-bepinex-thunderstore
         with:
           artifact_path: ./tmp_artifacts/*.zip
           token: ${{ secrets.THUNDERSTORE_TOKEN }}
