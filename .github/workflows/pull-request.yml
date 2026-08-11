@@ -30,7 +30,6 @@ jobs:
       - name: Run source checks
         uses: ./.github/actions/lint-source
   test:
-    name: Test
     # Smoke-test both Windows-targeted outputs on the oldest supported image.
     runs-on: windows-2022
 
