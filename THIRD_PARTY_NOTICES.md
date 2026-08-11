@@ -9,16 +9,16 @@ upstream license and notices continue to apply.
 - Source: [aoirint/skills](https://github.com/aoirint/skills), selected Skill
   directories under `.apm/skills/`
 - Pinned commit:
-  [`9831bb2c9d41ffbd9d41336b840384b3e303e2e8`](https://github.com/aoirint/skills/tree/9831bb2c9d41ffbd9d41336b840384b3e303e2e8)
+  [`f97f2cf209112a3dfafff5618bd5466f6f502e72`](https://github.com/aoirint/skills/tree/f97f2cf209112a3dfafff5618bd5466f6f502e72)
 - Deployed paths: selected directories under `.agents/skills/`, as recorded in
   `apm.lock.yaml`
 - License: MIT; see the
-  [upstream license](https://github.com/aoirint/skills/blob/9831bb2c9d41ffbd9d41336b840384b3e303e2e8/LICENSE)
+  [upstream license](https://github.com/aoirint/skills/blob/f97f2cf209112a3dfafff5618bd5466f6f502e72/LICENSE)
 - Copyright: Copyright (c) 2026 aoirint
 - Notice: the selected Skill directories contain no additional copyright or
   NOTICE files.
 - Cooldown: the maintainer waived the waiting period only for direct
   `aoirint/skills` commit
-  `9831bb2c9d41ffbd9d41336b840384b3e303e2e8` while requesting the
+  `f97f2cf209112a3dfafff5618bd5466f6f502e72` while requesting the
   PowerShell verification Skill rollout. Dependencies remain subject to normal
   review and cooldown requirements.
