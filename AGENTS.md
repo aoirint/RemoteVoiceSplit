@@ -99,7 +99,7 @@ add a persistent `BepInExPluginVersion` override to the project file.
 
 ## Documentation Skill
 
-Use `.agents/skills/software-documentation-maintenance/` when creating,
+Use `.agents/skills/domain-architecture-docs-workflow/` when creating,
 restructuring, maintaining, or reviewing developer documentation. Use
 `.agents/skills/prose-quality-check/` when refining explanatory wording after
 the document owner and technical evidence are established.
