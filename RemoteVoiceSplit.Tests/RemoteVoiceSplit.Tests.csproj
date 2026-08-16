@@ -38,6 +38,6 @@
     <Compile Include="..\RemoteVoiceSplit.AudioHost\Interop\WindowsAudio\WasapiRenderer.cs" Link="AudioHost\Interop\WindowsAudio\WasapiRenderer.cs" />
     <Compile Include="PackageContract.cs" />
     <Compile Include="Program.cs" />
-    <PackageReference Include="Mono.Cecil" Version="[0.11.4]" />
+    <PackageReference Include="Mono.Cecil" Version="[0.11.6]" />
   </ItemGroup>
 </Project>
