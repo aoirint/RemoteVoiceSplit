@@ -39,10 +39,10 @@ job downloads that exact artifact and never rebuilds it.
 
 For a prerelease, the pinned release action creates an immutable GitHub
 prerelease for the integrated commit and attaches only the validated ZIP.
-The current workflow stops there. A future reviewed beta-publication change
+The workflow publishes prereleases only. A separate beta-publication change
 may authorize one selected numeric version, keep its GitHub Release marked as
-a prerelease, and submit the same verified ZIP to Thunderstore. Stable
-publication remains separately gated by the complete runtime matrix.
+a prerelease, and submit the same validated ZIP to Thunderstore. Stable
+publication requires the complete runtime matrix.
 
 ## Failure boundaries
 
@@ -51,5 +51,5 @@ packaging, assembly inspection, archive validation, or checksum failure blocks
 artifact upload and publication. Edge builds skip publication.
 
 An existing release for the same tag fails instead of replacing assets. Edge
-and numeric builds currently skip publication. Recovery is documented in
+and numeric builds skip publication. Recovery is documented in
 [release operations](../operations/release.md).

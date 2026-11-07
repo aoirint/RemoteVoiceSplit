@@ -38,9 +38,6 @@ publication dates during the 2026-07-22 and 2026-07-23 reviews:
   Microsoft package with no dependencies.
 
 All direct packages exceed the seven-day adoption cooldown.
-Mono.Cecil was already present in the reviewed locked graph before the test
-project made it an exact direct dependency for managed-assembly validation; the
-resolved version and content hash did not change.
 Their transitive versions are immutable in the lockfile, including HarmonyX 2.7.0 and MonoMod RuntimeDetour 21.12.13.1.
 nuget.org records HarmonyX 2.7.0 as published on 2021-12-21 and MonoMod RuntimeDetour 21.12.13.1 on 2021-12-15.
 The Linux .NET SDK resolves Microsoft's framework-only
