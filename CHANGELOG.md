@@ -10,8 +10,9 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Changed
 
-- Use .NET SDK 11.0.100 for local and CI builds and configure a seven-day
-  NuGet cooldown for automatic version selection.
+- Use .NET SDK 11.0.100 for local and CI builds, target .NET 11 in the
+  test harness, and configure a seven-day NuGet cooldown for automatic
+  version selection.
 
 ## [0.1.0] - 2026-07-25 UTC
 
