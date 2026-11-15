@@ -120,6 +120,8 @@ supported operations and restore limitations.
 ## Development
 
 The repository pins .NET SDK 11.0.100 and all NuGet versions.
+Install .NET SDK 10.0.302 alongside it to run the unchanged Windows test harness;
+CI installs both SDKs and selects .NET 11 for builds.
 The build does not require a local Lethal Company installation.
 
 ```powershell
