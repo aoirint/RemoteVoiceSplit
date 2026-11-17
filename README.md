@@ -96,17 +96,6 @@ edits to the generated configuration file.
 Include the package version, Lethal Company build, configuration, and relevant
 log entries when [reporting a problem](CONTRIBUTING.md#reporting-issues).
 
-## NuGet minimum publish age
-
-The SDK selected by `global.json` provides NuGet 8 without changing the mod's
-runtime target.
-Both configured NuGet sources use a seven-day minimum publish age
-(`minPublishAgeHours="168"`).
-Keep package references non-floating and review lockfile changes.
-
-See [NuGet minimum publish age](docs/domain/dependencies.md#nuget-minimum-publish-age)
-for how the filter works and what it does not cover.
-
 ## Development
 
 The repository pins .NET SDK 11.0.100 and all NuGet versions.
