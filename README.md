@@ -152,4 +152,3 @@ issue or pull request.
 This project is released under the [MIT License](LICENSE).
 
 [bepinexpack-package]: https://thunderstore.io/c/lethal-company/p/BepInEx/BepInExPack/
-
