@@ -71,19 +71,37 @@ Use the checked-in package sources and source mappings.
    its CI before merging.
 
 Run from the repository root in PowerShell. The plugin, audio host, and test
-harness all use the root `nuget.config` and have separate lockfiles. For a
-plugin dependency update, run:
+harness use the root `nuget.config` and have separate lockfiles.
+
+For a plugin dependency update:
 
 ```powershell
-dotnet restore RemoteVoiceSplit/RemoteVoiceSplit.csproj --configfile nuget.config --force-evaluate --use-lock-file
-dotnet restore RemoteVoiceSplit.slnx --configfile nuget.config --locked-mode
+dotnet restore RemoteVoiceSplit/RemoteVoiceSplit.csproj `
+  --configfile nuget.config --force-evaluate --use-lock-file
 ```
 
-For audio-host or test dependencies, substitute
-`RemoteVoiceSplit.AudioHost/RemoteVoiceSplit.AudioHost.csproj` or
-`RemoteVoiceSplit.Tests/RemoteVoiceSplit.Tests.csproj` in the first command.
-Refresh only the affected locks outside CI, then use
-[Reproduce the build](#reproduce-the-build) for the format, build, and Windows
+For an audio-host dependency update:
+
+```powershell
+dotnet restore RemoteVoiceSplit.AudioHost/RemoteVoiceSplit.AudioHost.csproj `
+  --configfile nuget.config --force-evaluate --use-lock-file
+```
+
+For a test dependency update:
+
+```powershell
+dotnet restore RemoteVoiceSplit.Tests/RemoteVoiceSplit.Tests.csproj `
+  --configfile nuget.config --force-evaluate --use-lock-file
+```
+
+After reviewing the diff, verify the solution's lockfiles:
+
+```powershell
+dotnet restore RemoteVoiceSplit.slnx `
+  --configfile nuget.config --locked-mode
+```
+
+Use [Reproduce the build](#reproduce-the-build) for the format, build, and Windows
 test-harness commands.
 
 ## Dependency checks
