@@ -54,6 +54,7 @@ time-dependent host termination.
 
 Run from the repository root in PowerShell. The plugin, audio host, and test
 harness use the root `nuget.config` and have separate lockfiles.
+NuGet applies a seven-day cooldown to automatic version selection.
 
 For a plugin dependency update:
 
