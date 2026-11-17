@@ -83,9 +83,6 @@ dotnet restore RemoteVoiceSplit.slnx `
   --configfile nuget.config --locked-mode
 ```
 
-Use [Reproduce the build](#reproduce-the-build) for the format, build, and Windows
-test-harness commands.
-
 ## Dependency checks
 
 ```powershell
