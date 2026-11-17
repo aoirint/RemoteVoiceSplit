@@ -70,8 +70,6 @@ Use the checked-in package sources and source mappings.
    tests. Keep the project and lockfile changes together in the PR and verify
    its CI before merging.
 
-### RemoteVoiceSplit commands
-
 Run from the repository root in PowerShell. The plugin, audio host, and test
 harness all use the root `nuget.config` and have separate lockfiles. For a
 plugin dependency update, run:
