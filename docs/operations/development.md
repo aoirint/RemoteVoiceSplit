@@ -3,8 +3,7 @@
 ## Prerequisites
 
 - Windows PowerShell.
-- The SDK selected by `global.json` (`10.0.201` with compatible feature-band
-  roll-forward).
+- The SDK selected by `global.json`.
 - Network access to the mapped NuGet sources for the first restore.
 
 Game code and assets are research inputs, not build inputs. The solution must
@@ -50,6 +49,41 @@ Use `--live-audio-soak-seconds 60` instead of `--live-audio` to keep the first
 verified connection open for sixty seconds before exercising the remaining
 lifecycle checks. Increase the positive integer when investigating
 time-dependent host termination.
+
+## Dependency updates
+
+Run these commands from the repository root in PowerShell.
+
+Wait seven days after a package version is published unless a trusted
+security advisory warrants an earlier update.
+
+For a plugin dependency update:
+
+```powershell
+dotnet restore RemoteVoiceSplit/RemoteVoiceSplit.csproj `
+  --configfile nuget.config --force-evaluate --use-lock-file
+```
+
+For an audio-host dependency update:
+
+```powershell
+dotnet restore RemoteVoiceSplit.AudioHost/RemoteVoiceSplit.AudioHost.csproj `
+  --configfile nuget.config --force-evaluate --use-lock-file
+```
+
+For a test dependency update:
+
+```powershell
+dotnet restore RemoteVoiceSplit.Tests/RemoteVoiceSplit.Tests.csproj `
+  --configfile nuget.config --force-evaluate --use-lock-file
+```
+
+Verify the solution's lockfiles:
+
+```powershell
+dotnet restore RemoteVoiceSplit.slnx `
+  --configfile nuget.config --locked-mode
+```
 
 ## Dependency checks
 
