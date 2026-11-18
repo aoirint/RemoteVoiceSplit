@@ -96,27 +96,6 @@ edits to the generated configuration file.
 Include the package version, Lethal Company build, configuration, and relevant
 log entries when [reporting a problem](CONTRIBUTING.md#reporting-issues).
 
-## NuGet minimum publish age
-
-Use .NET SDK 11.0.100 or a later stable SDK selected by `global.json`.
-The configured NuGet sources use `minPublishAgeHours="168"` to delay
-automatic version selection by `dotnet package add` and
-`dotnet package update` for seven days. This NuGet 8 feature is the reason
-for adopting the .NET 11 STS SDK; it does not change the mod's runtime target.
-
-Explicit version requests bypass this filter. Ordinary restore, including
-transitive dependencies and locked restore, does not validate package age.
-Floating references with an applicable cooldown fail with NU1020; keep the
-existing non-floating package versions and review lockfile changes.
-Both nuget.org and the BepInEx feed expose registration `published` metadata.
-If an evaluated version lacks its publish date, automatic selection fails
-rather than assuming it is old enough. Source mappings and exceptions retain
-their existing scope. Cooldown expiry does not establish package trust;
-continue reviewing provenance, identity, hashes, and vulnerability signals.
-
-See [NuGet minimum package publish age][nuget-minimum-publish-age] for the
-supported operations and restore limitations.
-
 ## Development
 
 The repository pins .NET SDK 11.0.100 and all NuGet versions.
@@ -162,5 +141,3 @@ issue or pull request.
 This project is released under the [MIT License](LICENSE).
 
 [bepinexpack-package]: https://thunderstore.io/c/lethal-company/p/BepInEx/BepInExPack/
-
-[nuget-minimum-publish-age]: https://learn.microsoft.com/en-us/nuget/consume-packages/minimum-package-publish-age
